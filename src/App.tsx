@@ -1,9 +1,13 @@
+import { useState } from 'react'
+import { type InsertMethod } from './algorithms/parseListInput'
 import CanvasPanel from './components/CanvasPanel'
 import InputPanel from './components/InputPanel'
 import PlaybackControls from './player/PlaybackControls'
 import CodePanel from './teaching/CodePanel'
 
 function App() {
+  const [insertMethod, setInsertMethod] = useState<InsertMethod>('tail')
+
   return (
     <main className="experiment-page">
       <header className="page-header">
@@ -14,9 +18,9 @@ function App() {
         </div>
         <span className="preview-label">静态页面预览</span>
       </header>
-      <InputPanel />
+      <InputPanel insertMethod={insertMethod} />
       <div className="workspace">
-        <CanvasPanel />
+        <CanvasPanel insertMethod={insertMethod} onInsertMethodChange={setInsertMethod} />
         <CodePanel />
       </div>
       <PlaybackControls />

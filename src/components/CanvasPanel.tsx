@@ -1,9 +1,23 @@
-export default function CanvasPanel() {
+import type { InsertMethod } from '../algorithms/parseListInput'
+
+interface CanvasPanelProps {
+  insertMethod: InsertMethod
+  onInsertMethodChange: (method: InsertMethod) => void
+}
+
+export default function CanvasPanel({ insertMethod, onInsertMethodChange }: CanvasPanelProps) {
+
   return (
     <section className="canvas-panel panel" aria-labelledby="canvas-title">
       <div className="panel-heading">
         <h2 id="canvas-title">链表画布</h2>
-        <span className="badge">静态示意</span>
+        <div className="canvas-heading-controls">
+          <div className="method-switch" role="group" aria-label="插入方式">
+            <button type="button" className={insertMethod === 'head' ? 'selected' : ''} onClick={() => onInsertMethodChange('head')}>头插法</button>
+            <button type="button" className={insertMethod === 'tail' ? 'selected' : ''} onClick={() => onInsertMethodChange('tail')}>尾插法</button>
+          </div>
+          <span className="badge">静态示意</span>
+        </div>
       </div>
       <div className="canvas-surface">
         <svg viewBox="0 0 600 260" role="img" aria-labelledby="diagram-title diagram-description">

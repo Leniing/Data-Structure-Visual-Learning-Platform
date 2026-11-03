@@ -145,6 +145,13 @@ button:disabled, input:disabled, select:disabled { opacity: .64; }
 .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .panel-heading h2 { margin-bottom: 0; }
 .badge { padding: 4px 8px; }
+.canvas-heading-controls { display: flex; align-items: center; gap: 10px; }
+.method-switch { display: inline-flex; border: 1px solid #c9c0b2; border-radius: 4px; padding: 2px; background: #f1ede5; }
+.method-switch button { min-height: 28px; border: 0; border-radius: 2px; padding: 0 9px; background: transparent; color: #51483b; font-size: 11px; cursor: pointer; }
+.method-switch button.selected { background: #574e40; color: #fffefa; }
+.method-switch button:focus-visible { outline: 2px solid #347c65; outline-offset: 2px; }
+.field-error { color: #a52c21; font-weight: 600; }
+input[aria-invalid='true'] { border-color: #a52c21; }
 
 .canvas-surface {
   display: grid;
