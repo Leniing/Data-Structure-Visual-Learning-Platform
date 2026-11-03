@@ -1,9 +1,25 @@
+import CanvasPanel from './components/CanvasPanel'
+import InputPanel from './components/InputPanel'
+import PlaybackControls from './player/PlaybackControls'
+import CodePanel from './teaching/CodePanel'
+
 function App() {
   return (
-    <main className="welcome">
-      <p className="eyebrow">数据结构 · 可视化学习</p>
-      <h1>从结构开始，理解算法</h1>
-      <p className="description">学习平台正在搭建中。</p>
+    <main className="experiment-page">
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">数据结构 · 可视化学习</p>
+          <h1>单链表创建实验</h1>
+          <p className="page-description">从一个节点开始，理解数据之间的连接。</p>
+        </div>
+        <span className="preview-label">静态页面预览</span>
+      </header>
+      <InputPanel />
+      <div className="workspace">
+        <CanvasPanel />
+        <CodePanel />
+      </div>
+      <PlaybackControls />
     </main>
   )
 }
