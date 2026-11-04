@@ -6,14 +6,15 @@ describe('getLinkedListCode', () => {
     const headCode = getLinkedListCode('head')
     const tailCode = getLinkedListCode('tail')
 
-    expect(headCode.slice(0, 5).map((line) => line.id)).toEqual([
+    expect(headCode.slice(0, 6).map((line) => line.id)).toEqual([
       'include-vector',
+      'include-cstddef',
       'node-definition-start',
       'node-definition-data',
       'node-definition-next',
       'node-definition-end',
     ])
-    expect(tailCode.slice(0, 5).map((line) => line.id)).toEqual(headCode.slice(0, 5).map((line) => line.id))
+    expect(tailCode.slice(0, 6).map((line) => line.id)).toEqual(headCode.slice(0, 6).map((line) => line.id))
   })
 
   it('returns the fixed head-insertion example', () => {

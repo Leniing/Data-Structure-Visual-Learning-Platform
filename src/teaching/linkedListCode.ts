@@ -7,6 +7,7 @@ export interface CodeLine {
 
 const NODE_DEFINITION: readonly CodeLine[] = [
   { id: 'include-vector', code: '#include <vector>' },
+  { id: 'include-cstddef', code: '#include <cstddef>' },
   { id: 'node-definition-start', code: 'struct Node {' },
   { id: 'node-definition-data', code: '    int data;' },
   { id: 'node-definition-next', code: '    Node* next;' },
@@ -16,11 +17,14 @@ const NODE_DEFINITION: readonly CodeLine[] = [
 const HEAD_INSERTION_CODE: readonly CodeLine[] = [
   { id: 'head-function-start', code: 'Node* createByHead(const std::vector<int>& values) {' },
   { id: 'head-sentinel', code: '    Node* head = new Node{0, nullptr};' },
-  { id: 'head-create-node', code: '    for (int value : values) {' },
-  { id: 'head-link-node', code: '        Node* node = new Node{value, head->next};' },
+  { id: 'head-loop-start', code: '    for (std::size_t index = 0; index < values.size(); ++index) {' },
+  { id: 'head-read-value', code: '        const int value = values[index];' },
+  { id: 'head-create-node', code: '        Node* node = new Node{value, nullptr};' },
+  { id: 'head-link-node', code: '        node->next = head->next;' },
   { id: 'head-update-next', code: '        head->next = node;' },
   { id: 'head-loop-end', code: '    }' },
   { id: 'head-return', code: '    return head;' },
+
   { id: 'head-function-end', code: '}' },
 ]
 
