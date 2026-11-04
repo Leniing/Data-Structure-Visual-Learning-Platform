@@ -5,6 +5,8 @@ import InputPanel from './components/InputPanel'
 import PlaybackControls from './player/PlaybackControls'
 import CodePanel from './teaching/CodePanel'
 
+const DEMO_ACTIVE_LINE_ID = 'node-definition-next'
+
 function App() {
   const [insertMethod, setInsertMethod] = useState<InsertMethod>('tail')
 
@@ -21,7 +23,7 @@ function App() {
       <InputPanel insertMethod={insertMethod} />
       <div className="workspace">
         <CanvasPanel insertMethod={insertMethod} onInsertMethodChange={setInsertMethod} />
-        <CodePanel />
+        <CodePanel insertMethod={insertMethod} activeLineId={DEMO_ACTIVE_LINE_ID} />
       </div>
       <PlaybackControls />
     </main>
