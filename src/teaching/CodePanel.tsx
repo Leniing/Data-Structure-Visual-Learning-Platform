@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import type { InsertMethod } from '../algorithms/parseListInput'
-import { getLinkedListCode } from './linkedListCode'
+import { getLinkedListCode, type CodeLanguage } from './linkedListCode'
 
 interface CodePanelProps {
   insertMethod: InsertMethod
@@ -7,18 +8,24 @@ interface CodePanelProps {
 }
 
 export default function CodePanel({ insertMethod, activeLineId }: CodePanelProps) {
-  const codeLines = getLinkedListCode(insertMethod)
+  const [language, setLanguage] = useState<CodeLanguage>('cpp')
+  const codeLines = getLinkedListCode(insertMethod, language)
   const methodLabel = insertMethod === 'head' ? '头插法' : '尾插法'
+  const languageLabel = language === 'c' ? 'C' : 'C++'
+  const codeTitle = `${methodLabel} · ${languageLabel} 创建代码`
 
   return (
     <section className="code-panel panel" aria-labelledby="code-title">
       <div className="panel-heading">
         <h2 id="code-title">教学代码</h2>
-        <span className="badge">只读 · {methodLabel}</span>
+        <div className="method-switch language-switch" role="group" aria-label="代码语言">
+          <button type="button" className={language === 'c' ? 'selected' : ''} aria-pressed={language === 'c'} onClick={() => setLanguage('c')}>C</button>
+          <button type="button" className={language === 'cpp' ? 'selected' : ''} aria-pressed={language === 'cpp'} onClick={() => setLanguage('cpp')}>C++</button>
+        </div>
       </div>
       <div className="code-placeholder">
-        <span className="code-label">带头结点单链表 · 创建示例</span>
-        <ol className="code-lines" aria-label={`${methodLabel} C++ 代码`}>
+        <span className="code-label">{codeTitle}</span>
+        <ol className="code-lines" aria-label={`${methodLabel} ${languageLabel} 代码`}>
           {codeLines.map((line, index) => {
             const isActive = line.id === activeLineId
             return (
