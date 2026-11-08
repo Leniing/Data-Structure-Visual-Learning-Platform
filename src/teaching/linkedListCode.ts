@@ -1,4 +1,5 @@
 import type { InsertMethod } from '../algorithms/parseListInput'
+import { C_TAIL_CODE } from './cTailCode'
 
 export interface CodeLine {
   readonly id: string
@@ -53,23 +54,6 @@ const C_HEAD_INSERTION_CODE: readonly CodeLine[] = [
   { id: 'head-function-end', code: '}' },
 ]
 
-const C_TAIL_INSERTION_CODE: readonly CodeLine[] = [
-  { id: 'tail-function-start', code: 'Node* createByTail(const int* values, size_t length) {' },
-  { id: 'tail-sentinel', code: '    Node* head = (Node*)malloc(sizeof(Node));' },
-  { id: 'tail-sentinel-next', code: '    head->next = NULL;' },
-  { id: 'tail-initialise', code: '    Node* tail = head;' },
-  { id: 'tail-loop-start', code: '    for (size_t index = 0; index < length; ++index) {' },
-  { id: 'tail-read-value', code: '        int value = values[index];' },
-  { id: 'tail-create-node', code: '        Node* node = (Node*)malloc(sizeof(Node));' },
-  { id: 'tail-assign-data', code: '        node->data = value;' },
-  { id: 'tail-link-node', code: '        node->next = NULL;' },
-  { id: 'tail-update-next', code: '        tail->next = node;' },
-  { id: 'tail-advance', code: '        tail = node;' },
-  { id: 'tail-loop-end', code: '    }' },
-  { id: 'tail-return', code: '    return head;' },
-  { id: 'tail-function-end', code: '}' },
-]
-
 const CPP_TAIL_INSERTION_CODE: readonly CodeLine[] = [
   { id: 'tail-function-start', code: 'Node* createByTail(const std::vector<int>& values) {' },
   { id: 'tail-sentinel', code: '    Node* head = new Node{0, nullptr};' },
@@ -86,9 +70,10 @@ const CPP_TAIL_INSERTION_CODE: readonly CodeLine[] = [
 const SEPARATOR: CodeLine = { id: 'code-separator', code: '' }
 
 export function getLinkedListCode(insertMethod: InsertMethod, language: CodeLanguage = 'cpp'): readonly CodeLine[] {
+  if (language === 'c' && insertMethod === 'tail') return C_TAIL_CODE
   const nodeDefinition = language === 'c' ? C_NODE_DEFINITION : CPP_NODE_DEFINITION
   const insertionCode = language === 'c'
-    ? insertMethod === 'head' ? C_HEAD_INSERTION_CODE : C_TAIL_INSERTION_CODE
+    ? C_HEAD_INSERTION_CODE
     : insertMethod === 'head' ? HEAD_INSERTION_CODE : CPP_TAIL_INSERTION_CODE
 
   return [...nodeDefinition, SEPARATOR, ...insertionCode]

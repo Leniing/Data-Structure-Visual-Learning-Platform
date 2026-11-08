@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import { connectionArrowPath, moduleBoundary } from './canvasGeometry'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { Point } from './canvasGeometry'
+import { sceneArrow, tailScene } from './tailScene'
+import { useSceneMotion } from './useSceneMotion'
+import type { TailInsertionStep } from '../domain/tailInsertion'
 import type { PointerEvent } from 'react'
 import type { InsertMethod } from '../algorithms/parseListInput'
 
@@ -10,18 +13,21 @@ const ZOOM_STEP = 0.1
 interface CanvasPanelProps {
   insertMethod: InsertMethod
   onInsertMethodChange: (method: InsertMethod) => void
+  step: TailInsertionStep | null
+  playing: boolean
 }
 
-export default function CanvasPanel({ insertMethod, onInsertMethodChange }: CanvasPanelProps) {
+export default function CanvasPanel({ insertMethod, onInsertMethodChange, step, playing }: CanvasPanelProps) {
   const [zoom, setZoom] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
-  const [positions, setPositions] = useState([{ x: 160, y: 120 }, { x: 300, y: 120 }, { x: 440, y: 120 }])
-  const [headPosition, setHeadPosition] = useState({ x: 48, y: 120 })
-  const [nullPosition, setNullPosition] = useState({ x: 552, y: 120 })
+  const scene = useMemo(() => tailScene(step), [step])
+  const animatedItems = useSceneMotion(scene.items)
+  const [dragged, setDragged] = useState<{ step: TailInsertionStep | null; positions: Record<string, Point> }>({ step: null, positions: {} })
+  const items = animatedItems.map((item) => ({ ...item, position: dragged.step === step ? dragged.positions[item.id] ?? item.position : item.position }))
   const svgRef = useRef<SVGSVGElement>(null)
   const surfaceRef = useRef<HTMLDivElement>(null)
-  const dragStart = useRef<{ pointerId: number; x: number; y: number; offsetX: number; offsetY: number; nodeIndex: number | null; target: 'node' | 'head' | 'null' | 'canvas' } | null>(null)
+  const dragStart = useRef<{ pointerId: number; x: number; y: number; offsetX: number; offsetY: number; target: string | null; step: TailInsertionStep | null } | null>(null)
 
   const svgPoint = (clientX: number, clientY: number) => {
     const matrix = svgRef.current?.getScreenCTM()
@@ -48,14 +54,11 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange }: Canv
     const point = svgPoint(event.clientX, event.clientY)
     if (!point) return
     const target = event.target as Element
-    const nodeElement = target.closest('[data-node-index]')
-    const draggableElement = target.closest('[data-drag-target]')
-    const nodeIndex = nodeElement ? Number(nodeElement.getAttribute('data-node-index')) : null
-    const dragTarget = draggableElement?.getAttribute('data-drag-target')
-    const targetType: 'node' | 'head' | 'null' | 'canvas' = nodeIndex !== null ? 'node' : dragTarget === 'head' || dragTarget === 'null' ? dragTarget : 'canvas'
-    const position = targetType === 'node' ? positions[nodeIndex!] : targetType === 'head' ? headPosition : targetType === 'null' ? nullPosition : offset
+    const dragTarget = target.closest('[data-scene-id]')?.getAttribute('data-scene-id') ?? null
+    if (dragTarget && playing) return
+    const position = dragTarget ? items.find((item) => item.id === dragTarget)?.position : offset
     if (!position) return
-    dragStart.current = { pointerId: event.pointerId, x: point.x, y: point.y, offsetX: position.x, offsetY: position.y, nodeIndex, target: targetType }
+    dragStart.current = { pointerId: event.pointerId, x: point.x, y: point.y, offsetX: position.x, offsetY: position.y, target: dragTarget, step }
     setIsDragging(true)
   }
 
@@ -64,13 +67,12 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange }: Canv
     if (!start || start.pointerId !== event.pointerId) return
     const point = svgPoint(event.clientX, event.clientY)
     if (!point) return
-    const isCanvas = start.target === 'canvas'
+    const isCanvas = start.target === null
+    if (!isCanvas && (playing || start.step !== step)) return
     const divisor = isCanvas ? 1 : zoom
     const position = { x: start.offsetX + (point.x - start.x) / divisor, y: start.offsetY + (point.y - start.y) / divisor }
     if (isCanvas) setOffset(position)
-    else if (start.target === 'head') setHeadPosition(position)
-    else if (start.target === 'null') setNullPosition(position)
-    else setPositions((current) => current.map((node, index) => index === start.nodeIndex ? position : node))
+    else setDragged((current) => ({ step, positions: { ...(current.step === step ? current.positions : {}), [start.target!]: position } }))
   }
 
   const stopDragging = (event: PointerEvent<HTMLDivElement>) => {
@@ -89,7 +91,7 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange }: Canv
             <button type="button" className={insertMethod === 'head' ? 'selected' : ''} onClick={() => onInsertMethodChange('head')}>头插法</button>
             <button type="button" className={insertMethod === 'tail' ? 'selected' : ''} onClick={() => onInsertMethodChange('tail')}>尾插法</button>
           </div>
-          <span className="badge">静态示意</span>
+          <span className="badge">{step ? step.phase === 'complete' ? '创建完成' : '创建步骤' : '等待创建'}</span>
         </div>
       </div>
       <div
@@ -103,42 +105,33 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange }: Canv
         role="application"
         aria-label="可缩放和拖动的链表画布"
       >
-        <svg ref={svgRef} viewBox="0 0 600 260" role="img" aria-labelledby="diagram-title diagram-description">
-          <title id="diagram-title">单链表节点拖动示意</title>
-          <desc id="diagram-description">三个演示节点。每个节点由数据域和指针域组成，节点可单独拖动，箭头连接指针域与下一个数据域。</desc>
-          <g transform={`translate(${offset.x + 300 * (1 - zoom)} ${offset.y + 130 * (1 - zoom)}) scale(${zoom})`}>
-            <g data-drag-target="head" className="canvas-node canvas-endpoint" transform={`translate(${headPosition.x} ${headPosition.y})`}>
-              <rect x="-30" y="-16" width="60" height="32" className="svg-ghost-target" />
-              <text x="0" y="6" textAnchor="middle" className="svg-endpoint-label">head</text>
-            </g>
-            <path d={connectionArrowPath(moduleBoundary({ x: positions[0]!.x - 17, y: positions[0]!.y }, headPosition), positions[0]!)} className="svg-arrow" />
-            {positions.slice(0, -1).map((position, index) => {
-              const nextPosition = positions[index + 1]!
-              return (
-                <path
-                  key={`link-${index}`}
-                  d={connectionArrowPath({ x: position.x + 48, y: position.y }, nextPosition)}
-                  className="svg-arrow"
-                />
-              )
+        <svg ref={svgRef} viewBox={`0 0 ${scene.width} ${scene.height}`} role="img" aria-labelledby="diagram-title diagram-description">
+          <title id="diagram-title">无头结点尾插法创建动画</title>
+          <desc id="diagram-description">{step?.description ?? '画布为空，请填写两行输入并点击创建链表。'}</desc>
+          <g transform={`translate(${offset.x + scene.width / 2 * (1 - zoom)} ${offset.y + scene.height / 2 * (1 - zoom)}) scale(${zoom})`}>
+            {scene.links.map((link) => {
+              const from = items.find((item) => item.id === link.from)
+              const to = items.find((item) => item.id === link.to)
+              return from && to ? <path key={link.id} data-link-id={link.id} data-from={link.from} data-to={link.to} d={sceneArrow(from, to)} className="svg-arrow" /> : null
             })}
-            <path d={connectionArrowPath({ x: positions[2]!.x + 48, y: positions[2]!.y }, nullPosition, true)} className="svg-arrow" />
-            {positions.map((position, index) => (
-              <g key={`node-${index}`} data-node-index={index} className="canvas-node" transform={`translate(${position.x} ${position.y})`}>
-                <rect x="-48" y="-24" width="62" height="48" rx="5" className="svg-data-cell" />
-                <rect x="20" y="-24" width="28" height="48" rx="5" className="svg-pointer-cell" />
-                <text x="-17" y="6" textAnchor="middle" className="svg-value">{[5, 7, 4][index]}</text>
+            {items.map((item) => (
+              <g key={item.id} data-scene-id={item.id} data-kind={item.kind} className="canvas-node" transform={`translate(${item.position.x} ${item.position.y})`}>
+                {item.kind === 'node' ? <>
+                  <rect x="-48" y="-24" width="62" height="48" rx="5" className="svg-data-cell" />
+                  <rect x="20" y="-24" width="28" height="48" rx="5" className="svg-pointer-cell" />
+                  <text x="-17" y="6" textAnchor="middle" className="svg-value">{item.label}</text>
+                  {item.pending && <text x="-60" y="6" textAnchor="end" className="svg-endpoint-label">s</text>}
+                </> : <>
+                  <rect x="-30" y="-16" width="60" height="32" className="svg-ghost-target" />
+                  <text x="0" y="6" textAnchor="middle" className="svg-endpoint-label">{item.label}</text>
+                </>}
               </g>
             ))}
-            <g data-drag-target="null" className="canvas-node canvas-endpoint" transform={`translate(${nullPosition.x} ${nullPosition.y})`}>
-              <rect x="-30" y="-16" width="60" height="32" className="svg-ghost-target" />
-              <text x="0" y="6" textAnchor="middle" className="svg-endpoint-label">NULL</text>
-            </g>
           </g>
         </svg>
-        <p className="canvas-caption">拖动节点调整位置，拖动空白平移 · 滚轮缩放 {Math.round(zoom * 100)}%</p>
+        <p className="canvas-caption">{playing ? '播放中；暂停后可拖动节点' : '拖动节点调整位置'} · 空白平移 · 滚轮 {Math.round(zoom * 100)}%</p>
       </div>
-      <p className="panel-note">演示数据：5、7、4。头结点不保存用户数据；尚未连接输入或算法步骤。</p>
+      <p className="panel-note step-description" aria-live="polite">{step?.description ?? '点击“创建链表”开始；初始画布不显示任何节点或指针。'}</p>
     </section>
   )
 }

@@ -1,41 +1,40 @@
 import { useState } from 'react'
-import { parseListInput, type InsertMethod } from '../algorithms/parseListInput'
-
-const DEFAULT_INPUT = '3, 1, 4, 1, 5'
+import { DEFAULT_TERMINAL_INPUT, parseTerminalInput } from '../algorithms/parseTerminalInput'
 
 interface InputPanelProps {
-  insertMethod: InsertMethod
+  supported: boolean
+  onCreate: (values: readonly number[]) => void
+  onInputChange: () => void
 }
 
-export default function InputPanel({ insertMethod }: InputPanelProps) {
-  const [input, setInput] = useState(DEFAULT_INPUT)
-  const result = parseListInput(input)
+export default function InputPanel({ supported, onCreate, onInputChange }: InputPanelProps) {
+  const [input, setInput] = useState(DEFAULT_TERMINAL_INPUT)
+  const result = parseTerminalInput(input)
 
   return (
     <section className="input-panel panel" aria-labelledby="input-title">
       <div>
         <h2 id="input-title">创建单链表</h2>
-        <p className="muted">输入节点值，逐步观察链表的创建过程。</p>
+        <p className="muted">第一行输入 n，第二行用空格分隔节点值。</p>
+        <p className="field-hint">n = 0 时第二行留空；本次演示无头结点的 C 尾插法。</p>
       </div>
       <div className="input-controls">
-        <label htmlFor="node-values">节点值 <span className="muted">（最多 12 个，范围 -999 至 999）</span></label>
+        <label htmlFor="node-values">终端输入 <span className="muted">（0～12 个整数，值为 -999～999）</span></label>
         <div className="input-row">
-          <input
+          <textarea
             id="node-values"
-            type="text"
-            placeholder="例如：12, 24, 36"
-            maxLength={160}
+            rows={2}
+            spellCheck={false}
+            placeholder={'4\n5 7 4 3'}
             value={input}
             aria-invalid={!result.ok}
             aria-describedby="input-feedback"
-            onChange={(event) => setInput(event.target.value)}
+            onChange={(event) => { setInput(event.target.value); onInputChange() }}
           />
-          <button type="button" className="primary-button" disabled>创建链表</button>
+          <button type="button" className="primary-button" disabled={!result.ok || !supported} onClick={() => { if (result.ok && supported) onCreate(result.values) }}>创建链表</button>
         </div>
         <p id="input-feedback" className={`field-hint ${result.ok ? '' : 'field-error'}`} aria-live="polite">
-          {result.ok
-            ? `输入有效 · ${result.values.length} 个值 · ${insertMethod === 'head' ? '头插法' : '尾插法'}`
-            : result.error}
+          {!result.ok ? result.error : !supported ? '此组合仅提供教学代码；请选择“尾插法 + C”创建动画。' : `输入有效 · ${result.values.length} 个值 · 点击创建开始演示`}
         </p>
       </div>
     </section>

@@ -1,14 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import type { InsertMethod } from '../algorithms/parseListInput'
 import { getLinkedListCode, type CodeLanguage } from './linkedListCode'
 
 interface CodePanelProps {
   insertMethod: InsertMethod
   activeLineId: string | null
+  condition: boolean | null
+  language: CodeLanguage
+  onLanguageChange: (language: CodeLanguage) => void
 }
 
-export default function CodePanel({ insertMethod, activeLineId }: CodePanelProps) {
-  const [language, setLanguage] = useState<CodeLanguage>('cpp')
+export default function CodePanel({ insertMethod, activeLineId, condition, language, onLanguageChange }: CodePanelProps) {
+  const scroller = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const container = scroller.current
+    const line = container?.querySelector<HTMLElement>('[aria-current="step"]')
+    if (container && line) {
+      const top = line.offsetTop
+      if (top < container.scrollTop || top + line.offsetHeight > container.scrollTop + container.clientHeight) {
+        container.scrollTop = Math.max(0, top - container.clientHeight / 2)
+      }
+    }
+  }, [activeLineId])
   const codeLines = getLinkedListCode(insertMethod, language)
   const methodLabel = insertMethod === 'head' ? '头插法' : '尾插法'
   const languageLabel = language === 'c' ? 'C' : 'C++'
@@ -19,11 +32,11 @@ export default function CodePanel({ insertMethod, activeLineId }: CodePanelProps
       <div className="panel-heading">
         <h2 id="code-title">教学代码</h2>
         <div className="method-switch language-switch" role="group" aria-label="代码语言">
-          <button type="button" className={language === 'c' ? 'selected' : ''} aria-pressed={language === 'c'} onClick={() => setLanguage('c')}>C</button>
-          <button type="button" className={language === 'cpp' ? 'selected' : ''} aria-pressed={language === 'cpp'} onClick={() => setLanguage('cpp')}>C++</button>
+          <button type="button" className={language === 'c' ? 'selected' : ''} aria-pressed={language === 'c'} onClick={() => onLanguageChange('c')}>C</button>
+          <button type="button" className={language === 'cpp' ? 'selected' : ''} aria-pressed={language === 'cpp'} onClick={() => onLanguageChange('cpp')}>C++</button>
         </div>
       </div>
-      <div className="code-placeholder">
+      <div ref={scroller} className="code-placeholder">
         <span className="code-label">{codeTitle}</span>
         <ol className="code-lines" aria-label={`${methodLabel} ${languageLabel} 代码`}>
           {codeLines.map((line, index) => {
@@ -31,7 +44,7 @@ export default function CodePanel({ insertMethod, activeLineId }: CodePanelProps
             return (
               <li
                 key={line.id}
-                className={`code-line ${isActive ? 'active' : ''}`}
+                className={`code-line ${isActive ? condition === false ? 'active condition-false' : 'active' : ''}`}
                 data-line-id={line.id}
                 aria-current={isActive ? 'step' : undefined}
               >
@@ -42,8 +55,8 @@ export default function CodePanel({ insertMethod, activeLineId }: CodePanelProps
           })}
         </ol>
       </div>
-      <p className="panel-note">头结点不保存用户数据；此示例只演示创建，使用结束后需要释放所有节点。</p>
-      <p className="panel-note">代码不可编辑、不可执行。当前高亮由演示行标识 <code>{activeLineId ?? '无'}</code> 控制。</p>
+      <p className="panel-note">{language === 'c' && insertMethod === 'tail' ? '无头结点：head 指向首个数据节点。演示正常输入与分配成功路径。' : '带头结点示例：头结点不保存用户数据；此组合尚未接入动画。'} 使用结束后需要释放所有节点。</p>
+      <p className="panel-note">只读示例，不执行代码。黄色为当前步骤，红色表示条件不成立。网页会严格校验两行格式；scanf 本身不限制换行。</p>
     </section>
   )
 }
