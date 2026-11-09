@@ -41,7 +41,7 @@ export function createByTailSteps(values: readonly number[]): readonly TailInser
   tailId = null
   emit('tail-initialise', '创建尾指针：tail 也指向 NULL。')
   emit('tail-count-declare', '声明节点个数 n，等待读取第一行。')
-  emit('tail-count', `读取第一行：n = ${values.length}，输入检查通过。`)
+  emit('tail-count', `读取第一行：n = ${values.length}。`)
 
   for (let index = 0; index < values.length; index++) {
     inputIndex = index
@@ -49,10 +49,9 @@ export function createByTailSteps(values: readonly number[]): readonly TailInser
     newNodeId = `node-${index}`
     nodes = [...nodes, { id: newNodeId, data: null, next: undefined }]
     emit('tail-create-node', '分配新节点 s：数据域和 next 尚未初始化。')
-    emit('tail-allocation-check', '本次演示分配成功，继续读取数据。')
-    nodes = nodes.map((node) => node.id === newNodeId ? { ...node, data: values[index]! } : node)
     emit('tail-read-value', `读取第 ${index + 1} 个值 ${values[index]}，写入 s 的数据域。`)
-    emit('tail-value-check', '数据读取成功且在范围内，继续创建。')
+    nodes = nodes.map((node) => node.id === newNodeId ? { ...node, data: values[index]! } : node)
+    emit('tail-read-value', `第 ${index + 1} 个值已写入 s 的数据域。`)
     nodes = nodes.map((node) => node.id === newNodeId ? { ...node, next: null } : node)
     emit('tail-link-node', '将 s->next 初始化为 NULL。')
     const isFirst = headId === null
@@ -79,7 +78,6 @@ export function createByTailSteps(values: readonly number[]): readonly TailInser
   }
   inputIndex = values.length
   emit('tail-loop-start', `i = ${values.length}，i < ${values.length} 不成立（红色），退出循环。`, false)
-  emit('tail-return', values.length ? '返回 head，链表创建完成。' : '返回 NULL，空链表创建完成。')
   emit(null, '创建完成；可拖动节点查看连线，或重新输入并创建。', null, 'complete')
   return Object.freeze(steps)
 }

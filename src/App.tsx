@@ -23,7 +23,13 @@ function App() {
         </div>
         <span className="preview-label">C 尾插法 · 无头结点</span>
       </header>
-      <InputPanel supported={supported} onCreate={player.start} onInputChange={player.reset} />
+      <InputPanel
+        supported={supported}
+        activeInput={player.current?.codeLineId === 'tail-count' ? 'count' : player.current?.codeLineId === 'tail-read-value' ? 'value' : null}
+        inputIndex={player.current?.inputIndex ?? null}
+        onCreate={player.start}
+        onInputChange={player.reset}
+      />
       <div className="workspace">
         <CanvasPanel key={player.runId} insertMethod={insertMethod} onInsertMethodChange={(method) => { if (method !== insertMethod) { player.reset(); setInsertMethod(method) } }} step={player.current} playing={player.playing} />
         <CodePanel insertMethod={insertMethod} language={language} onLanguageChange={(next) => { if (next !== language) { player.reset(); setLanguage(next) } }} activeLineId={player.current?.codeLineId ?? null} condition={player.current?.condition ?? null} />

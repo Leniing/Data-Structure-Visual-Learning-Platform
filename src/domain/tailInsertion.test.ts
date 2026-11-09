@@ -24,7 +24,11 @@ describe('createByTailSteps', () => {
     const steps = createByTailSteps([5, 7])
     const allocated = steps.find((step) => step.codeLineId === 'tail-create-node')!
     expect(allocated.nodes[0]).toEqual({ id: 'node-0', data: null, next: undefined })
-    expect(steps.find((step) => step.codeLineId === 'tail-read-value')!.nodes[0]).toMatchObject({ data: 5, next: undefined })
+    const readSteps = steps.filter((step) => step.codeLineId === 'tail-read-value')
+    expect(readSteps[0]).toMatchObject({ inputIndex: 0, nodes: [{ data: null, next: undefined }] })
+    expect(readSteps[1]).toMatchObject({ inputIndex: 0, nodes: [{ data: 5, next: undefined }] })
+    expect(readSteps[2]).toMatchObject({ inputIndex: 1, nodes: [{ data: 5, next: null }, { data: null, next: undefined }] })
+    expect(readSteps[3]).toMatchObject({ inputIndex: 1, nodes: [{ data: 5, next: null }, { data: 7, next: undefined }] })
     expect(steps.filter((step) => step.codeLineId === 'tail-if-first').map((step) => step.condition)).toEqual([true, false])
     const linked = steps.find((step) => step.codeLineId === 'tail-update-next' && step.phase === 'attach')!
     expect(linked.nodes[0]?.next).toBe('node-1')

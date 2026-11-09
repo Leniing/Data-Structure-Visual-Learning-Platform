@@ -35,6 +35,34 @@ describe('getLinkedListCode', () => {
     expect(tailCode.some((line) => line.code.includes('new Node'))).toBe(false)
   })
 
+  it('keeps the C tail demonstration limited to the supplied creation statements', () => {
+    const statements = getLinkedListCode('tail', 'c')
+      .map((line) => line.code.replace(/\/\/.*$/, '').trim())
+      .filter(Boolean)
+    expect(statements).toEqual([
+      'typedef struct Node {',
+      'int data;',
+      'struct Node* next;',
+      '} Node;',
+      'Node* head = NULL;',
+      'Node* tail = NULL;',
+      'int n;',
+      'scanf("%d", &n);',
+      'for (int i = 0; i < n; i++) {',
+      'Node* s = (Node*)malloc(sizeof(Node));',
+      'scanf("%d", &s->data);',
+      's->next = NULL;',
+      'if (head == NULL) {',
+      'head = tail = s;',
+      '}',
+      'else {',
+      'tail->next = s;',
+      'tail = s;',
+      '}',
+      '}',
+    ])
+  })
+
   it('returns the fixed C++ tail-insertion example', () => {
     const code = getLinkedListCode('tail', 'cpp')
 

@@ -133,7 +133,25 @@ textarea {
   color: #29251f;
   font: 14px/1.5 'Consolas', 'Courier New', monospace;
 }
-textarea[aria-invalid='true'] { border-color: #a52c21; }
+.terminal-input-wrap { position: relative; flex: 1 1 auto; min-width: 0; }
+.terminal-input-highlight {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+  color: transparent;
+  font: 14px/1.5 'Consolas', 'Courier New', monospace;
+  pointer-events: none;
+  white-space: pre;
+}
+.terminal-input-line { display: block; width: max-content; min-width: 100%; height: 21px; }
+.terminal-input-token.active { border-radius: 2px; background: #e8d9ad; box-shadow: 0 0 0 1px #e8d9ad; }
+.terminal-input-wrap textarea { position: relative; display: block; background: transparent; color: #29251f; }
+.terminal-input-wrap textarea[aria-invalid='true'] { border-color: #a52c21; }
+.terminal-input-wrap textarea::placeholder { color: #777066; }
+.terminal-input-wrap textarea::selection { background: rgb(52 124 101 / 28%); }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 button:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #347c65; outline-offset: 2px; }
