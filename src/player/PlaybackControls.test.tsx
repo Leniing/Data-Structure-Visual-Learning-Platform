@@ -17,6 +17,7 @@ it('switches pause and resume icons on the same button and preserves playback ac
   const render = () => act(() => root.render(<PlaybackControls player={player} />))
   try {
     render()
+    expect(host.querySelector('.muted')?.textContent).toBe('2 / 3 步 · 播放中')
     const toggle = host.querySelector<HTMLButtonElement>('[aria-label="暂停"]')!
     expect(toggle.querySelector('img')?.getAttribute('src')).toContain('pause.png')
     expect(host.querySelectorAll('.playback-buttons button')).toHaveLength(4)
@@ -25,6 +26,7 @@ it('switches pause and resume icons on the same button and preserves playback ac
     expect(player.toggle).toHaveBeenCalledOnce()
     player.playing = false
     render()
+    expect(host.querySelector('.muted')?.textContent).toBe('2 / 3 步 · 已暂停')
     expect(host.querySelector('[aria-label="继续"]')).toBe(toggle)
     expect(toggle.querySelector('img')?.getAttribute('src')).toContain('resume.png')
     act(() => {
@@ -38,10 +40,12 @@ it('switches pause and resume icons on the same button and preserves playback ac
     player.index = 2
     player.atEnd = true
     render()
+    expect(host.querySelector('.muted')?.textContent).toBe('3 / 3 步 · 创建完成')
     expect(toggle.getAttribute('aria-label')).toBe('重播')
     expect(host.querySelector<HTMLButtonElement>('[aria-label="下一步"]')!.disabled).toBe(true)
     player.total = 0
     render()
+    expect(host.querySelector('.muted')?.textContent).toBe('等待创建')
     expect([...host.querySelectorAll<HTMLButtonElement>('.playback-buttons button')].every((button) => button.disabled)).toBe(true)
   } finally {
     act(() => root.unmount())

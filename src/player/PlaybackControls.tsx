@@ -12,7 +12,7 @@ export default function PlaybackControls({ player }: { player: ReturnType<typeof
     <section className="playback-panel panel" aria-labelledby="playback-title">
       <div>
         <h2 id="playback-title">播放控制</h2>
-        <p className="muted">{total ? `${index + 1} / ${total} 步 · ${atEnd ? '创建完成' : playing ? '播放中' : '已暂停'}` : '等待创建 · 画布为空'}</p>
+        <p className="muted">{total ? `${index + 1} / ${total} 步 · ${atEnd ? '创建完成' : playing ? '播放中' : '已暂停'}` : '等待创建'}</p>
       </div>
       <div className="playback-buttons" role="group" aria-label="播放操作">
         <button type="button" aria-label="重置" title="重置" disabled={!total} onClick={reset}>
