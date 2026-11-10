@@ -3,6 +3,23 @@ import { createRoot } from 'react-dom/client'
 import { expect, it, vi } from 'vitest'
 import CodePanel from './CodePanel'
 
+it.each([
+  ['tail', 'c', 'C语言 尾插法'],
+  ['tail', 'cpp', 'C++ 尾插法'],
+  ['head', 'c', 'C语言 头插法'],
+  ['head', 'cpp', 'C++ 头插法'],
+] as const)('labels %s insertion in %s as %s', (insertMethod, language, title) => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+  const host = document.createElement('div')
+  const root = createRoot(host)
+  try {
+    act(() => root.render(<CodePanel insertMethod={insertMethod} language={language} onLanguageChange={() => {}} activeLineId={null} condition={null} />))
+    expect(host.querySelector('.code-label')?.textContent).toBe(title)
+  } finally {
+    act(() => root.unmount())
+  }
+})
+
 it('scrolls the highlighted line inside the code panel and marks false conditions', () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
   const host = document.createElement('div')

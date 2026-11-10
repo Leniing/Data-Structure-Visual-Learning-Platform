@@ -25,7 +25,7 @@ export default function CodePanel({ insertMethod, activeLineId, condition, langu
   const codeLines = getLinkedListCode(insertMethod, language)
   const methodLabel = insertMethod === 'head' ? '头插法' : '尾插法'
   const languageLabel = language === 'c' ? 'C' : 'C++'
-  const codeTitle = `${methodLabel} · ${languageLabel} 创建代码`
+  const codeTitle = `${language === 'c' ? 'C语言' : languageLabel} ${methodLabel}`
 
   return (
     <section className="code-panel panel" aria-labelledby="code-title">
@@ -55,8 +55,6 @@ export default function CodePanel({ insertMethod, activeLineId, condition, langu
           })}
         </ol>
       </div>
-      <p className="panel-note">{language === 'c' ? '无头结点：head 指向首个数据节点。演示正常输入与分配成功路径。' : '带头结点示例：头结点不保存用户数据；此组合尚未接入动画。'} 使用结束后需要释放所有节点。</p>
-      <p className="panel-note">只读教学片段，不编译或执行。黄色为当前步骤，红色表示条件不成立。网页单独校验输入；scanf 本身不限制换行。</p>
     </section>
   )
 }

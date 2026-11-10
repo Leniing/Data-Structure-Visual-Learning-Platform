@@ -39,8 +39,8 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
 
   return (
     <section className="input-panel panel" aria-labelledby="input-title">
-      <div>
-        <h2 id="input-title">创建单链表</h2>
+      <div className="panel-heading">
+        <h2 id="input-title">输入数据</h2>
       </div>
       <div className="input-controls">
         <div className="input-row">

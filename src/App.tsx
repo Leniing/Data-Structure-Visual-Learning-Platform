@@ -17,20 +17,18 @@ function App() {
     <main className="experiment-page">
       <header className="page-header">
         <div>
-          <p className="eyebrow">数据结构 · 可视化学习</p>
-          <h1>单链表创建实验</h1>
-          <p className="page-description">从一个节点开始，理解数据之间的连接。</p>
+          <h1>单链表创建</h1>
+          <p className="page-description">从一个节点开始，理解数据之间的连接</p>
         </div>
-        <span className="preview-label">C {insertMethod === 'head' ? '头插法' : '尾插法'} · 无头结点</span>
       </header>
-      <InputPanel
-        supported={supported}
-        activeInput={player.current?.codeLineId === `${insertMethod}-count` ? 'count' : player.current?.codeLineId === `${insertMethod}-read-value` ? 'value' : null}
-        inputIndex={player.current?.inputIndex ?? null}
-        onCreate={player.start}
-        onInputChange={player.reset}
-      />
       <div className="workspace">
+        <InputPanel
+          supported={supported}
+          activeInput={player.current?.codeLineId === `${insertMethod}-count` ? 'count' : player.current?.codeLineId === `${insertMethod}-read-value` ? 'value' : null}
+          inputIndex={player.current?.inputIndex ?? null}
+          onCreate={player.start}
+          onInputChange={player.reset}
+        />
         <CanvasPanel key={player.runId} insertMethod={insertMethod} onInsertMethodChange={(method) => { if (method !== insertMethod) { player.setInsertMethod(method); setInsertMethod(method) } }} step={player.current} playing={player.playing} />
         <CodePanel insertMethod={insertMethod} language={language} onLanguageChange={(next) => { if (next !== language) { player.reset(); setLanguage(next) } }} activeLineId={player.current?.codeLineId ?? null} condition={player.current?.condition ?? null} />
       </div>

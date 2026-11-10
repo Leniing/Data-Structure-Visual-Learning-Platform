@@ -92,7 +92,6 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange, step, 
             <button type="button" className={insertMethod === 'head' ? 'selected' : ''} onClick={() => onInsertMethodChange('head')}>头插法</button>
             <button type="button" className={insertMethod === 'tail' ? 'selected' : ''} onClick={() => onInsertMethodChange('tail')}>尾插法</button>
           </div>
-          <span className="badge">{step ? step.phase === 'complete' ? '创建完成' : '创建步骤' : '等待创建'}</span>
         </div>
       </div>
       <div
@@ -130,9 +129,12 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange, step, 
             ))}
           </g>
         </svg>
-        <p className="canvas-caption">{playing ? '播放中；暂停后可拖动节点' : '拖动节点调整位置'} · 空白平移 · 滚轮 {Math.round(zoom * 100)}%</p>
+        <div className="canvas-zoom" role="group" aria-label="画布缩放" onPointerDown={(event) => event.stopPropagation()}>
+          <button type="button" aria-label="缩小" title="缩小" disabled={zoom <= MIN_ZOOM} onClick={() => setZoom((value) => Math.max(MIN_ZOOM, value - ZOOM_STEP))}>−</button>
+          <output aria-label="缩放比例">{Math.round(zoom * 100)}%</output>
+          <button type="button" aria-label="放大" title="放大" disabled={zoom >= MAX_ZOOM} onClick={() => setZoom((value) => Math.min(MAX_ZOOM, value + ZOOM_STEP))}>+</button>
+        </div>
       </div>
-      <p className="panel-note step-description" aria-live="polite">{step?.description ?? '点击“创建链表”开始；初始画布不显示任何节点或指针。'}</p>
     </section>
   )
 }
