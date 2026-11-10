@@ -58,7 +58,18 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
                   overlay.scrollLeft = event.currentTarget.scrollLeft
                 }
               }}
-              onChange={(event) => { setInput(event.target.value); onInputChange() }}
+              onKeyDown={(event) => {
+                if (event.key !== 'Enter') return
+                const { value, selectionStart, selectionEnd } = event.currentTarget
+                const remaining = value.slice(0, selectionStart) + value.slice(selectionEnd)
+                if (remaining.includes('\n')) event.preventDefault()
+              }}
+              onChange={(event) => {
+                const value = event.target.value.replace(/\r\n?/g, '\n')
+                if (value.split('\n').length > 2) return
+                setInput(value)
+                onInputChange()
+              }}
             />
           </div>
           <button type="button" className="primary-button" disabled={!result.ok || !supported} onClick={() => { if (result.ok && supported) onCreate(result.values) }}>创建链表</button>
