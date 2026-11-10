@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
 
 :root {
   font-family: 'DM Sans', 'Noto Sans SC', sans-serif;
@@ -283,13 +283,13 @@ input[aria-invalid='true'] { border-color: #a52c21; }
   font-size: 11px;
 }
 
-.code-lines { margin: 0; padding: 14px 0; color: #3c3832; font: 12px/1.8 'Consolas', 'Courier New', monospace; list-style: none; }
+.code-lines { margin: 0; padding: 14px 0; color: #3c3832; font: 12px/1.8 'JetBrains Mono', 'Consolas', 'Courier New', monospace; list-style: none; }
 .code-line { display: flex; min-width: max-content; padding: 1px 14px 1px 0; }
 .code-line.active { background: #e8d9ad; color: #29251f; }
 .code-line.active.condition-false { background: #f7d7d0; color: #8b2118; }
 .code-line.active.condition-false .code-line-number { color: #8b2118; }
 .code-line-number { width: 38px; flex: 0 0 38px; padding-right: 12px; color: #968b7b; text-align: right; user-select: none; }
-.code-line code { white-space: pre; }
+.code-line code { font-family: inherit; white-space: pre; }
 .code-line.active .code-line-number { color: #695c46; font-weight: 700; }
 
 .playback-panel {
