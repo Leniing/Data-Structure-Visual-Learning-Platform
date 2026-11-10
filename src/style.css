@@ -95,7 +95,7 @@ h2 {
 
 .muted { margin-bottom: 0; line-height: 1.6; }
 
-.input-controls label, .speed-control {
+.speed-control {
   display: block;
   margin-bottom: 7px;
   color: #38332c;
@@ -103,7 +103,14 @@ h2 {
   font-weight: 600;
 }
 
-.input-row { display: flex; gap: 9px; }
+.input-controls {
+  display: grid;
+  grid-template-rows: 22px auto 22px;
+  min-width: 0;
+}
+
+.input-row { grid-row: 2; display: flex; gap: 9px; }
+.input-controls .field-hint { grid-row: 3; line-height: 16px; }
 
 input, select, .playback-buttons button {
   min-height: 40px;

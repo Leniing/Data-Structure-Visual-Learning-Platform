@@ -11,9 +11,20 @@ interface InputPanelProps {
 
 export default function InputPanel({ supported, activeInput, inputIndex, onCreate, onInputChange }: InputPanelProps) {
   const [input, setInput] = useState(DEFAULT_TERMINAL_INPUT)
+  const [focused, setFocused] = useState(false)
+  const [composing, setComposing] = useState(false)
+  const [notice, setNotice] = useState('')
+  const [caret, setCaret] = useState(0)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const highlightRef = useRef<HTMLPreElement>(null)
   const result = parseTerminalInput(input)
+  const empty = !input.trim()
+  const beforeCaret = input.slice(0, caret)
+  const editingSign = focused && beforeCaret.includes('\n') && /(?:\s)[+-]$/.test(beforeCaret)
+    && (caret === input.length || /\s/.test(input[caret]!))
+  const message = notice || (composing || (editingSign && !result.ok && result.error === '节点值须为整数')
+    ? '' : empty ? focused ? '请输入节点个数和节点值' : '' : result.ok ? '' : result.error)
+  const isError = Boolean(message) && !empty && !(focused && ['请输入节点个数', '节点值个数不足'].includes(message))
   const highlightedInput = activeInput === 'count' ? 0 : activeInput === 'value' && inputIndex !== null ? 1 : null
   const renderInputLine = (line: string, lineIndex: number) => {
     if (highlightedInput !== lineIndex) return line || ' '
@@ -30,11 +41,8 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
     <section className="input-panel panel" aria-labelledby="input-title">
       <div>
         <h2 id="input-title">创建单链表</h2>
-        <p className="muted">第一行输入 n，第二行用空格分隔节点值。</p>
-        <p className="field-hint">n = 0 时第二行留空；本次演示无头结点的 C 头插法或尾插法。</p>
       </div>
       <div className="input-controls">
-        <label htmlFor="node-values">终端输入 <span className="muted">（0～12 个整数，值为 -999～999）</span></label>
         <div className="input-row">
           <div className="terminal-input-wrap">
             <pre ref={highlightRef} className="terminal-input-highlight" aria-hidden="true">
@@ -44,13 +52,28 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
             </pre>
             <textarea
               id="node-values"
+              aria-label="节点输入"
               ref={textareaRef}
               rows={2}
               spellCheck={false}
               placeholder={'4\n5 7 4 3'}
               value={input}
-              aria-invalid={!result.ok}
-              aria-describedby="input-feedback"
+              aria-invalid={isError}
+              aria-describedby={message ? 'input-feedback' : undefined}
+              onFocus={() => setFocused(true)}
+              onBlur={() => { setFocused(false); setComposing(false) }}
+              onSelect={(event) => setCaret(event.currentTarget.selectionStart)}
+              onCompositionStart={() => setComposing(true)}
+              onCompositionEnd={() => setComposing(false)}
+              onPaste={(event) => {
+                const target = event.currentTarget
+                const pasted = event.clipboardData.getData('text').replace(/\r\n?/g, '\n')
+                const next = target.value.slice(0, target.selectionStart) + pasted + target.value.slice(target.selectionEnd)
+                if (next.split('\n').length > 2 || next.length > 160) {
+                  event.preventDefault()
+                  setNotice(next.split('\n').length > 2 ? '仅支持两行输入' : '输入不能超过 160 个字符')
+                }
+              }}
               onScroll={(event) => {
                 const overlay = highlightRef.current
                 if (overlay) {
@@ -66,7 +89,10 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
               }}
               onChange={(event) => {
                 const value = event.target.value.replace(/\r\n?/g, '\n')
-                if (value.split('\n').length > 2) return
+                if (value.split('\n').length > 2) { setNotice('仅支持两行输入'); return }
+                if (value.length > 160) { setNotice('输入不能超过 160 个字符'); return }
+                setNotice('')
+                setCaret(event.target.selectionStart)
                 setInput(value)
                 onInputChange()
               }}
@@ -74,8 +100,8 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
           </div>
           <button type="button" className="primary-button" disabled={!result.ok || !supported} onClick={() => { if (result.ok && supported) onCreate(result.values) }}>创建链表</button>
         </div>
-        <p id="input-feedback" className={`field-hint ${result.ok ? '' : 'field-error'}`} aria-live="polite">
-          {!result.ok ? result.error : !supported ? '此组合仅提供教学代码；请选择 C 语言创建动画。' : `输入有效 · ${result.values.length} 个值 · 点击创建开始演示`}
+        <p id="input-feedback" className={`field-hint ${isError ? 'field-error' : ''}`} aria-live="polite">
+          {message}
         </p>
       </div>
     </section>

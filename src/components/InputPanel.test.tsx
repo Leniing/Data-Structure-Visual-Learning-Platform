@@ -3,6 +3,31 @@ import { createRoot } from 'react-dom/client'
 import { expect, it } from 'vitest'
 import InputPanel from './InputPanel'
 
+it('hides valid feedback and explains rejected multiline paste without changing input', () => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+  const host = document.createElement('div')
+  const root = createRoot(host)
+  try {
+    act(() => root.render(<InputPanel supported activeInput={null} inputIndex={null} onCreate={() => {}} onInputChange={() => {}} />))
+    const input = host.querySelector('textarea')!
+    const feedback = host.querySelector('#input-feedback') as HTMLElement
+    expect(host.querySelector('label')).toBeNull()
+    expect(input.getAttribute('aria-label')).toBe('节点输入')
+    expect(feedback.hidden).toBe(false)
+    expect(feedback.textContent).toBe('')
+    input.setSelectionRange(0, input.value.length)
+    const paste = new Event('paste', { bubbles: true, cancelable: true })
+    Object.defineProperty(paste, 'clipboardData', { value: { getData: () => '2\n1\n2' } })
+    act(() => input.dispatchEvent(paste))
+    expect(paste.defaultPrevented).toBe(true)
+    expect(input.value).toBe('5\n3 1 4 1 5')
+    expect(feedback.hidden).toBe(false)
+    expect(feedback.textContent).toBe('仅支持两行输入')
+  } finally {
+    act(() => root.unmount())
+  }
+})
+
 it('blocks a third line but allows replacing the existing newline', () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
   const host = document.createElement('div')
