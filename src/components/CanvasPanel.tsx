@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Point } from './canvasGeometry'
-import { sceneArrow, tailScene } from './tailScene'
+import { headScene, sceneArrow, tailScene } from './tailScene'
 import { useSceneMotion } from './useSceneMotion'
+import type { HeadInsertionStep } from '../domain/headInsertion'
 import type { TailInsertionStep } from '../domain/tailInsertion'
 import type { PointerEvent } from 'react'
 import type { InsertMethod } from '../algorithms/parseListInput'
@@ -13,7 +14,7 @@ const ZOOM_STEP = 0.1
 interface CanvasPanelProps {
   insertMethod: InsertMethod
   onInsertMethodChange: (method: InsertMethod) => void
-  step: TailInsertionStep | null
+  step: TailInsertionStep | HeadInsertionStep | null
   playing: boolean
 }
 
@@ -21,13 +22,13 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange, step, 
   const [zoom, setZoom] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
-  const scene = useMemo(() => tailScene(step), [step])
+  const scene = useMemo(() => insertMethod === 'head' ? headScene(step as HeadInsertionStep | null) : tailScene(step as TailInsertionStep | null), [insertMethod, step])
   const animatedItems = useSceneMotion(scene.items)
-  const [dragged, setDragged] = useState<{ step: TailInsertionStep | null; positions: Record<string, Point> }>({ step: null, positions: {} })
+  const [dragged, setDragged] = useState<{ step: TailInsertionStep | HeadInsertionStep | null; positions: Record<string, Point> }>({ step: null, positions: {} })
   const items = animatedItems.map((item) => ({ ...item, position: dragged.step === step ? dragged.positions[item.id] ?? item.position : item.position }))
   const svgRef = useRef<SVGSVGElement>(null)
   const surfaceRef = useRef<HTMLDivElement>(null)
-  const dragStart = useRef<{ pointerId: number; x: number; y: number; offsetX: number; offsetY: number; target: string | null; step: TailInsertionStep | null } | null>(null)
+  const dragStart = useRef<{ pointerId: number; x: number; y: number; offsetX: number; offsetY: number; target: string | null; step: TailInsertionStep | HeadInsertionStep | null } | null>(null)
 
   const svgPoint = (clientX: number, clientY: number) => {
     const matrix = svgRef.current?.getScreenCTM()
@@ -106,7 +107,7 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange, step, 
         aria-label="可缩放和拖动的链表画布"
       >
         <svg ref={svgRef} viewBox={`0 0 ${scene.width} ${scene.height}`} role="img" aria-labelledby="diagram-title diagram-description">
-          <title id="diagram-title">无头结点尾插法创建动画</title>
+          <title id="diagram-title">无头结点{insertMethod === 'head' ? '头插法' : '尾插法'}创建动画</title>
           <desc id="diagram-description">{step?.description ?? '画布为空，请填写两行输入并点击创建链表。'}</desc>
           <g transform={`translate(${offset.x + scene.width / 2 * (1 - zoom)} ${offset.y + scene.height / 2 * (1 - zoom)}) scale(${zoom})`}>
             {scene.links.map((link) => {

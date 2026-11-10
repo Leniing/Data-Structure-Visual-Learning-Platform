@@ -28,8 +28,8 @@ describe('getLinkedListCode', () => {
     const headCode = getLinkedListCode('head', 'c')
     const tailCode = getLinkedListCode('tail', 'c')
 
-    expect(headCode[0]).toEqual({ id: 'include-stdlib', code: '#include <stdlib.h>' })
-    expect(headCode.some((line) => line.id === 'head-link-node' && line.code.includes('head->next'))).toBe(true)
+    expect(headCode[0]).toEqual({ id: 'node-definition-start', code: 'typedef struct Node {' })
+    expect(headCode.some((line) => line.id === 'head-link-node' && line.code.includes('s->next = head'))).toBe(true)
     expect(tailCode.some((line) => line.id === 'tail-update-next' && line.code.includes('tail->next'))).toBe(true)
     expect(headCode.some((line) => line.code.includes('std::vector'))).toBe(false)
     expect(tailCode.some((line) => line.code.includes('new Node'))).toBe(false)

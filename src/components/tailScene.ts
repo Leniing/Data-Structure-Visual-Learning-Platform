@@ -1,3 +1,4 @@
+import type { HeadInsertionStep } from '../domain/headInsertion'
 import type { TailInsertionStep } from '../domain/tailInsertion'
 import { connectionArrowPath, moduleBoundary, type Point } from './canvasGeometry'
 
@@ -16,6 +17,63 @@ export interface SceneLink {
 }
 
 const settledPosition = (index: number): Point => ({ x: 160 + index * 140, y: 130 })
+
+export function headScene(step: HeadInsertionStep | null) {
+  const items: SceneItem[] = []
+  const links: SceneLink[] = []
+  if (!step) return { items, links, height: 300, width: 660 }
+
+  const arrowLength = 62
+  const firstNodeX = 48 + 30 + arrowLength + 48
+  const nodeSpacing = 96 + arrowLength
+  const pendingPosition = { x: 48 + 30 + arrowLength / 2, y: 55 }
+  const settledPosition = (index: number): Point => ({ x: firstNodeX + index * nodeSpacing, y: 130 })
+  const nodeById = new Map(step.nodes.map((node) => [node.id, node]))
+  const orderedIds: string[] = []
+  let currentId = step.headId
+  while (currentId !== null && currentId !== undefined && !orderedIds.includes(currentId)) {
+    orderedIds.push(currentId)
+    currentId = nodeById.get(currentId)?.next ?? null
+  }
+  for (const node of step.nodes) {
+    if (!orderedIds.includes(node.id)) orderedIds.push(node.id)
+  }
+  const settledIds = orderedIds.filter((id) => id !== step.newNodeId)
+  for (const nodeId of orderedIds) {
+    const node = nodeById.get(nodeId)
+    if (!node) continue
+    items.push({
+      id: node.id,
+      kind: 'node',
+      position: node.id === step.newNodeId ? pendingPosition : settledPosition(settledIds.indexOf(node.id)),
+      label: node.data === null ? '' : String(node.data),
+      pending: node.id === step.newNodeId && step.phase !== 'attach',
+    })
+  }
+
+  const nullTarget = (sourceId: string) => {
+    const id = 'null-end'
+    if (!items.some((item) => item.id === id)) {
+      const source = items.find((item) => item.id === sourceId)
+      const x = source?.kind === 'node' && source.id !== step.newNodeId
+        ? source.position.x + 48 + arrowLength + 30
+        : 48 + 30 + arrowLength + 30
+      items.push({ id, kind: 'null', label: 'NULL', position: { x, y: 130 } })
+    }
+    return id
+  }
+
+  items.push({ id: 'head', kind: 'pointer', position: { x: 48, y: 130 }, label: 'head' })
+  const isDisconnect = step.phase === 'disconnect'
+  if (!isDisconnect) links.push({ id: 'head-link', from: 'head', to: step.headId ?? nullTarget('head') })
+  for (const node of step.nodes) {
+    if (node.next === undefined) continue
+    links.push({ id: `${node.id}-next`, from: node.id, to: node.next ?? nullTarget(node.id) })
+  }
+  const height = Math.max(300, ...items.map((item) => item.position.y + 75))
+  const width = Math.max(660, ...items.map((item) => item.position.x + 80))
+  return { items, links, height, width }
+}
 
 export function tailScene(step: TailInsertionStep | null) {
   const items: SceneItem[] = []

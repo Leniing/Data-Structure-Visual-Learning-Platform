@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
+import { createByHeadSteps, type HeadInsertionStep } from '../domain/headInsertion'
 import { createByTailSteps, type TailInsertionStep } from '../domain/tailInsertion'
+import type { InsertMethod } from '../algorithms/parseListInput'
 
 export function useTailPlayer() {
-  const [steps, setSteps] = useState<readonly TailInsertionStep[]>([])
+  const [method, setMethod] = useState<InsertMethod>('tail')
+  const [steps, setSteps] = useState<readonly (TailInsertionStep | HeadInsertionStep)[]>([])
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
@@ -26,8 +29,13 @@ export function useTailPlayer() {
     setRunId((value) => value + 1)
   }
 
+  function setInsertMethod(nextMethod: InsertMethod) {
+    setMethod(nextMethod)
+    reset()
+  }
+
   function start(values: readonly number[]) {
-    setSteps(createByTailSteps(values))
+    setSteps(method === 'head' ? createByHeadSteps(values) : createByTailSteps(values))
     setIndex(0)
     setPlaying(true)
     setRunId((value) => value + 1)
@@ -47,5 +55,5 @@ export function useTailPlayer() {
     setPlaying((value) => !value)
   }
 
-  return { current, index, total: steps.length, playing, speed, runId, atEnd, start, reset, move, toggle, setSpeed }
+  return { current, index, total: steps.length, playing, speed, runId, atEnd, start, reset, move, toggle, setSpeed, method, setInsertMethod }
 }
