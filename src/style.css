@@ -21,6 +21,11 @@ body {
 
 button, input, textarea, select { font: inherit; }
 
+.learning-shell { -webkit-user-select: none; user-select: none; }
+.learning-shell input,
+.learning-shell textarea,
+.learning-shell .code-line code { -webkit-user-select: text; user-select: text; }
+
 .experiment-page {
   width: min(1440px, 100%);
   display: grid;

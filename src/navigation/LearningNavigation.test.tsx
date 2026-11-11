@@ -52,7 +52,14 @@ it('opens knowledge only on click, keeps placeholders inert and maps menu action
     act(() => button('设置').dispatchEvent(new Event('pointerdown', { bubbles: true })))
     expect(host.querySelectorAll('[role="status"]')).toHaveLength(1)
     act(() => vi.advanceTimersByTime(2000))
-    expect(host.querySelector('[role="status"]')?.textContent).toBe('')
+    expect(host.querySelector('[role="status"]')?.classList.contains('visible')).toBe(false)
+    expect(host.querySelector('[role="status"]')?.textContent).toContain('功能暂未开放')
+    act(() => {
+      const event = new Event('transitionend', { bubbles: true })
+      Object.defineProperty(event, 'propertyName', { value: 'opacity' })
+      host.querySelector('[role="status"]')!.dispatchEvent(event)
+    })
+    expect(host.querySelector('[role="status"]')?.textContent?.trim()).toBe('')
     act(() => button('AI 解答').click())
     expect(openAi).toHaveBeenCalledOnce()
     act(() => {

@@ -14,6 +14,7 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
   const [navExpanded, setNavExpanded] = useState(false)
   const [chapterPanelOpen, setChapterPanelOpen] = useState(false)
   const [toast, setToast] = useState('')
+  const [toastVisible, setToastVisible] = useState(false)
   const nav = useRef<HTMLElement>(null)
   const knowledgeButton = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -27,7 +28,8 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
   const notify = (message: string) => {
     clearTimeout(toastTimer.current)
     setToast(message)
-    toastTimer.current = setTimeout(() => setToast(''), timings.toast)
+    setToastVisible(true)
+    toastTimer.current = setTimeout(() => setToastVisible(false), timings.toast)
   }
   const onOverview = () => notify('功能暂未开放')
   const onPractice = () => notify('功能暂未开放')
@@ -139,6 +141,9 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
       </div>
       <button className="nav-settings" type="button" aria-label="设置" onClick={() => run(onSettings)}>{icon('settings')}<span>设置</span></button>
     </nav>
-    <div className={`learning-toast ${toast ? 'visible' : ''}`} role="status" aria-live="polite">{toast}</div>
+    <div className={`learning-toast ${toastVisible ? 'visible' : ''}`} role="status" aria-live="polite"
+      onTransitionEnd={(event) => { if (event.target === event.currentTarget && event.propertyName === 'opacity' && !toastVisible) setToast('') }}>
+      <span aria-hidden={!toastVisible}>{toast}</span>
+    </div>
   </>
 }
