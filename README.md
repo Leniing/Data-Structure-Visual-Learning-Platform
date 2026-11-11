@@ -40,6 +40,15 @@ npm run dev
 - 教学 C 代码按用户提供的创建片段展示，仅补充 `typedef struct Node Node;`，使 C 中的 `Node*` 写法有效，并调整排版与注释。不展示头文件、函数包裹、输入/分配失败检查或清理逻辑；此片段不是独立可编译程序，不编译或执行。网页输入校验与 TypeScript 动画逻辑在教学面板之外，动画只演示正常输入、分配成功路径。scanf 本身按空白读取，网页两行格式校验更严格。
 - 此示例没有头结点；head 是首个数据节点的指针。实际使用链表时需要释放所有节点。其他 C/C++ 示例仍是带头结点版本，未接入动画。
 
+## 学习导航与浮窗
+
+左侧保留 64px 导航空间，展开部分覆盖工作区，不改变画布尺寸。本章知识点击打开；学习总览、练习挑战与设置当前仅提示“功能暂未开放”。
+
+- 章节配置位于 `src/navigation/chapter.ts`，由页面传入 `LearningNavigation`。替换 `items` 中的标题、状态和 route 后，通过 `App.tsx` 的 `onSelectKnowledge` 接入实际演示状态；占位项保持 `placeholder`，不会跳转。
+- 三个未开放入口分别由 `LearningNavigation.tsx` 中的 `onOverview`、`onPractice`、`onSettings` 处理，可独立替换。
+- 导航延迟集中在 `src/navigation/timing.ts` 的 `navigationTiming`；浮层层级集中在 `navigation.css` 的 `--layer-*` 变量。
+- AI 浮窗默认未接入服务，不发送请求、不生成演示回复。聊天适配器位于 `src/ai/`；未来通过服务端代理实现其 Promise 接口并启用配置，前端不保存密钥。关闭浮窗只隐藏，当前页面会话中的草稿与窗口位置保留。
+
 ## 检查命令
 
 ```bash

@@ -6,14 +6,21 @@ import PlaybackControls from './player/PlaybackControls'
 import CodePanel from './teaching/CodePanel'
 import type { CodeLanguage } from './teaching/linkedListCode'
 import { useTailPlayer } from './player/useTailPlayer'
+import LearningNavigation from './navigation/LearningNavigation'
+import { linkedListChapter } from './navigation/chapter'
+import AiWindow from './ai/AiWindow'
 
 function App() {
   const [insertMethod, setInsertMethod] = useState<InsertMethod>('tail')
   const [language, setLanguage] = useState<CodeLanguage>('c')
   const player = useTailPlayer()
   const supported = language === 'c'
+  const [aiWindowVisible, setAiWindowVisible] = useState(false)
 
   return (
+    <div className="learning-shell">
+    <LearningNavigation chapter={linkedListChapter} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={() => { /* 配置真实知识点时在此接入现有演示状态。 */ }} />
+    <AiWindow visible={aiWindowVisible} onClose={() => setAiWindowVisible(false)} context={{ chapterId: linkedListChapter.chapterId, chapterTitle: linkedListChapter.chapterTitle, language }} />
     <main className="experiment-page">
       <header className="page-header">
         <div>
@@ -34,6 +41,7 @@ function App() {
       </div>
       <PlaybackControls player={player} />
     </main>
+    </div>
   )
 }
 
