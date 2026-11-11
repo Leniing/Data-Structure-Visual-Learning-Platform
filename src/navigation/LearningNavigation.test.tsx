@@ -30,6 +30,26 @@ it('opens knowledge only on click, keeps placeholders inert and maps menu action
       act(() => button(name).click())
       expect(host.querySelector('[role="status"]')?.textContent).toBe('功能暂未开放')
     }
+    for (const name of ['学习总览', 'AI 解答', '练习挑战', '设置']) {
+      act(() => {
+        button(name).dispatchEvent(new Event('pointerdown', { bubbles: true }))
+        button(name).focus()
+        button(name).click()
+        button(name).dispatchEvent(new MouseEvent('pointerout', { bubbles: true, relatedTarget: document.body }))
+      })
+      act(() => vi.advanceTimersByTime(180))
+      expect(host.querySelector('nav')?.classList.contains('expanded')).toBe(false)
+    }
+    openAi.mockClear()
+    act(() => {
+      button('设置').blur()
+      button('设置').focus()
+      button('设置').dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+      button('设置').dispatchEvent(new MouseEvent('pointerout', { bubbles: true, relatedTarget: document.body }))
+    })
+    act(() => vi.advanceTimersByTime(180))
+    expect(host.querySelector('nav')?.classList.contains('expanded')).toBe(true)
+    act(() => button('设置').dispatchEvent(new Event('pointerdown', { bubbles: true })))
     expect(host.querySelectorAll('[role="status"]')).toHaveLength(1)
     act(() => vi.advanceTimersByTime(2000))
     expect(host.querySelector('[role="status"]')?.textContent).toBe('')

@@ -52,7 +52,7 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
     clearTimeout(collapseTimer.current)
     if (chapterPanelOpen) return
     collapseTimer.current = setTimeout(() => {
-      if (!hovered.current && !nav.current?.contains(document.activeElement)) setNavExpanded(false)
+      if (!hovered.current && (!keyboardMode.current || !nav.current?.contains(document.activeElement))) setNavExpanded(false)
     }, timings.collapse)
     return () => clearTimeout(collapseTimer.current)
   }, [chapterPanelOpen, timings.collapse])
@@ -103,7 +103,7 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
         clearTimeout(expandTimer.current)
         clearTimeout(collapseTimer.current)
         collapseTimer.current = setTimeout(() => {
-          if (!nav.current?.contains(document.activeElement) && !panel.current) setNavExpanded(false)
+          if ((!keyboardMode.current || !nav.current?.contains(document.activeElement)) && !panel.current) setNavExpanded(false)
         }, timings.collapse)
       }}
       onFocus={() => { clearTimeout(collapseTimer.current); setNavExpanded(true) }}
