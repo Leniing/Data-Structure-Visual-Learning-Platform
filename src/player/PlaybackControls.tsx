@@ -1,9 +1,11 @@
 import type { useTailPlayer } from './useTailPlayer'
-import pauseIcon from '../assets/playback/pause.png'
-import resetIcon from '../assets/playback/reset.png'
-import resumeIcon from '../assets/playback/resume.png'
-import stepBackIcon from '../assets/playback/step-back.png'
-import stepForwardIcon from '../assets/playback/step-forward.png'
+
+const iconBase = `${import.meta.env.BASE_URL}pictures/`
+const pauseIcon = `${iconBase}pause.svg`
+const resetIcon = `${iconBase}reset.svg`
+const resumeIcon = `${iconBase}resume.svg`
+const stepBackIcon = `${iconBase}step-back.svg`
+const stepForwardIcon = `${iconBase}step-forward.svg`
 
 export default function PlaybackControls({ player }: { player: ReturnType<typeof useTailPlayer> }) {
   const { total, index, playing, atEnd, speed, reset, move, toggle, setSpeed } = player

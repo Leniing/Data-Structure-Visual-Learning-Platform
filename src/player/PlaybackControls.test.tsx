@@ -19,7 +19,10 @@ it('switches pause and resume icons on the same button and preserves playback ac
     render()
     expect(host.querySelector('.muted')?.textContent).toBe('2 / 3 步 · 播放中')
     const toggle = host.querySelector<HTMLButtonElement>('[aria-label="暂停"]')!
-    expect(toggle.querySelector('img')?.getAttribute('src')).toContain('pause.png')
+    expect(toggle.querySelector('img')?.getAttribute('src')).toBe('/pictures/pause.svg')
+    expect(host.querySelector('[aria-label="重置"] img')?.getAttribute('src')).toBe('/pictures/reset.svg')
+    expect(host.querySelector('[aria-label="上一步"] img')?.getAttribute('src')).toBe('/pictures/step-back.svg')
+    expect(host.querySelector('[aria-label="下一步"] img')?.getAttribute('src')).toBe('/pictures/step-forward.svg')
     expect(host.querySelectorAll('.playback-buttons button')).toHaveLength(4)
     expect(host.querySelector('.playback-buttons')?.textContent?.trim()).toBe('')
     act(() => toggle.click())
@@ -28,7 +31,7 @@ it('switches pause and resume icons on the same button and preserves playback ac
     render()
     expect(host.querySelector('.muted')?.textContent).toBe('2 / 3 步 · 已暂停')
     expect(host.querySelector('[aria-label="继续"]')).toBe(toggle)
-    expect(toggle.querySelector('img')?.getAttribute('src')).toContain('resume.png')
+    expect(toggle.querySelector('img')?.getAttribute('src')).toBe('/pictures/resume.svg')
     act(() => {
       host.querySelector<HTMLButtonElement>('[aria-label="重置"]')!.click()
       host.querySelector<HTMLButtonElement>('[aria-label="上一步"]')!.click()
