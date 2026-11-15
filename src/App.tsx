@@ -14,7 +14,7 @@ function App() {
   const [insertMethod, setInsertMethod] = useState<InsertMethod>('tail')
   const [language, setLanguage] = useState<CodeLanguage>('c')
   const player = useTailPlayer()
-  const supported = language === 'c'
+  const supported = true
   const [aiWindowVisible, setAiWindowVisible] = useState(false)
 
   return (

@@ -6,7 +6,6 @@ import type { HeadInsertionStep } from '../domain/headInsertion'
 import type { TailInsertionStep } from '../domain/tailInsertion'
 import type { PointerEvent } from 'react'
 import type { InsertMethod } from '../algorithms/parseListInput'
-
 const MIN_ZOOM = 0.6
 const MAX_ZOOM = 1.8
 const ZOOM_STEP = 0.1
@@ -107,7 +106,7 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange, step, 
       >
         <svg ref={svgRef} viewBox={`0 0 ${scene.width} ${scene.height}`} role="img" aria-labelledby="diagram-title diagram-description">
           <title id="diagram-title">无头结点{insertMethod === 'head' ? '头插法' : '尾插法'}创建动画</title>
-          <desc id="diagram-description">{step?.description ?? '画布为空，请填写两行输入并点击创建链表。'}</desc>
+          <desc id="diagram-description">{step ? step.description : '画布为空，请填写两行输入并点击创建链表。'}</desc>
           <g transform={`translate(${offset.x + scene.width / 2 * (1 - zoom)} ${offset.y + scene.height / 2 * (1 - zoom)}) scale(${zoom})`}>
             {scene.links.map((link) => {
               const from = items.find((item) => item.id === link.from)
