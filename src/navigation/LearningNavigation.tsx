@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import PlatformIcon from '../components/PlatformIcon'
 import type { Chapter, KnowledgeItem } from './chapter'
 import './navigation.css'
 import { navigationTiming } from './timing'
@@ -7,10 +8,13 @@ interface Props {
   chapter: Chapter
   onOpenAi: () => void
   onSelectKnowledge: (item: KnowledgeItem) => void
+  onSettings: () => void
+  settingsOpen?: boolean
   timings?: typeof navigationTiming
 }
 
-export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledge, timings = navigationTiming }: Props) {
+export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledge, onSettings, settingsOpen, timings = navigationTiming }: Props) {
+  const [settingsHoverSuppressed, setSettingsHoverSuppressed] = useState(false)
   const [navExpanded, setNavExpanded] = useState(false)
   const [chapterPanelOpen, setChapterPanelOpen] = useState(false)
   const [toast, setToast] = useState('')
@@ -33,7 +37,6 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
   }
   const onOverview = () => notify('功能暂未开放')
   const onPractice = () => notify('功能暂未开放')
-  const onSettings = () => notify('功能暂未开放')
   const closeChapter = () => {
     clearTimeout(panelTimer.current)
     setChapterPanelOpen(false)
@@ -87,7 +90,6 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
   }, [])
 
   const run = (action: () => void) => { closeChapter(); action() }
-  const icon = (file: string) => <img src={`${import.meta.env.BASE_URL}pictures/${file}.svg`} width="24" height="24" alt="" />
 
   return <>
     <nav ref={nav} className={`learning-nav ${navExpanded || chapterPanelOpen ? 'expanded' : ''}`} aria-label="学习导航"
@@ -118,12 +120,12 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
         }
       }}>
       <div className="nav-top">
-        <button type="button" aria-label="学习总览" onClick={() => run(onOverview)}>{icon('learning-overview')}<span>学习总览</span></button>
+        <button type="button" aria-label="学习总览" onClick={() => run(onOverview)}><PlatformIcon name="learning-overview" colored /><span>学习总览</span></button>
         <div className="knowledge-anchor" onPointerEnter={() => clearTimeout(panelTimer.current)} onPointerLeave={(event) => { if (event.pointerType !== 'touch') schedulePanelClose() }}
           onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) schedulePanelClose() }}>
           <button ref={knowledgeButton} type="button" aria-label="本章知识" aria-expanded={chapterPanelOpen} aria-controls="chapter-knowledge"
             onClick={() => { clearTimeout(panelTimer.current); setNavExpanded(true); setChapterPanelOpen(!chapterPanelOpen) }}>
-            {icon('knowledge')}<span>本章知识</span>
+            <PlatformIcon name="knowledge" colored /><span>本章知识</span>
           </button>
           {chapterPanelOpen && <div ref={panel} id="chapter-knowledge" className="chapter-panel" role="region" aria-label="本章知识"
             onFocus={() => clearTimeout(panelTimer.current)}>
@@ -136,10 +138,16 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
             </li>)}</ul>
           </div>}
         </div>
-        <button type="button" aria-label="AI 解答" onClick={() => run(onOpenAi)}>{icon('ai-answer')}<span>AI 解答</span></button>
-        <button type="button" aria-label="练习挑战" onClick={() => run(onPractice)}>{icon('practice-challenge')}<span>练习挑战</span></button>
+        <button type="button" aria-label="AI 解答" onClick={() => run(onOpenAi)}><PlatformIcon name="ai-answer" colored /><span>AI 解答</span></button>
+        <button type="button" aria-label="练习挑战" onClick={() => run(onPractice)}><PlatformIcon name="practice-challenge" colored /><span>练习挑战</span></button>
       </div>
-      <button className="nav-settings" type="button" aria-label="设置" onClick={() => run(onSettings)}>{icon('settings')}<span>设置</span></button>
+      <button className="nav-settings" type="button" aria-label="设置" aria-current={settingsOpen ? 'page' : undefined}
+        data-hover-suppressed={settingsHoverSuppressed || undefined}
+        onPointerLeave={() => setSettingsHoverSuppressed(false)}
+        onClick={(event) => {
+          if (event.detail > 0) setSettingsHoverSuppressed(true)
+          run(onSettings)
+        }}><PlatformIcon name="settings" colored /><span>设置</span></button>
     </nav>
     <div className={`learning-toast ${toastVisible ? 'visible' : ''}`} role="status" aria-live="polite"
       onTransitionEnd={(event) => { if (event.target === event.currentTarget && event.propertyName === 'opacity' && !toastVisible) setToast('') }}>

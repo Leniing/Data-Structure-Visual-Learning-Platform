@@ -1,11 +1,6 @@
 import type { useTailPlayer } from './useTailPlayer'
 
-const iconBase = `${import.meta.env.BASE_URL}pictures/`
-const pauseIcon = `${iconBase}pause.svg`
-const resetIcon = `${iconBase}reset.svg`
-const resumeIcon = `${iconBase}resume.svg`
-const stepBackIcon = `${iconBase}step-back.svg`
-const stepForwardIcon = `${iconBase}step-forward.svg`
+import PlatformIcon from '../components/PlatformIcon'
 
 export default function PlaybackControls({ player }: { player: ReturnType<typeof useTailPlayer> }) {
   const { total, index, playing, atEnd, speed, reset, move, toggle, setSpeed } = player
@@ -18,16 +13,16 @@ export default function PlaybackControls({ player }: { player: ReturnType<typeof
       </div>
       <div className="playback-buttons" role="group" aria-label="播放操作">
         <button type="button" aria-label="重置" title="重置" disabled={!total} onClick={reset}>
-          <img src={resetIcon} alt="" />
+          <PlatformIcon name="reset" />
         </button>
         <button type="button" aria-label="上一步" title="上一步" disabled={!total || index === 0} onClick={() => move(-1)}>
-          <img src={stepBackIcon} alt="" />
+          <PlatformIcon name="step-back" />
         </button>
         <button type="button" className="playback-toggle" aria-label={toggleLabel} title={toggleLabel} disabled={!total} onClick={toggle}>
-          <img src={playing ? pauseIcon : resumeIcon} alt="" />
+          <PlatformIcon name={playing ? 'pause' : 'resume'} />
         </button>
         <button type="button" aria-label="下一步" title="下一步" disabled={!total || atEnd} onClick={() => move(1)}>
-          <img src={stepForwardIcon} alt="" />
+          <PlatformIcon name="step-forward" />
         </button>
       </div>
       <label className="speed-control" htmlFor="playback-speed">

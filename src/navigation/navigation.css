@@ -3,10 +3,10 @@
   --layer-navigation: 200;
   --layer-ai: 300;
   --layer-toast: 400;
-  --learning-surface: #faf8f3;
-  --learning-ink: #574f42;
-  --learning-border: #d8d0c3;
-  --learning-hover: #ede8df;
+  --learning-surface: var(--appearance-surface, #faf8f3);
+  --learning-ink: var(--appearance-nav-ink, #574f42);
+  --learning-border: var(--appearance-dots, #d8d0c3);
+  --learning-hover: var(--appearance-nav-hover, #ede8df);
 }
 
 .learning-shell { padding-left: 64px; }
@@ -42,9 +42,14 @@
   text-align: left;
   cursor: pointer;
 }
-.learning-nav button:hover, .learning-nav button[aria-expanded="true"] { background: var(--learning-hover); }
-.learning-nav button:focus-visible { outline: 2px solid #96836a; outline-offset: -3px; }
-.learning-nav button img { flex: 0 0 24px; }
+.learning-nav button:not(.nav-settings):hover,
+.learning-nav button[aria-expanded="true"] { background: var(--learning-hover); }
+
+@media (hover: hover) {
+  .learning-nav .nav-settings:not([data-hover-suppressed]):hover { background: var(--learning-hover); }
+}
+.learning-nav button:focus-visible { outline: 2px solid var(--appearance-nav-focus, #96836a); outline-offset: -3px; }
+.learning-nav .platform-icon { flex: 0 0 24px; height: 24px; }
 .learning-nav button > span {
   white-space: nowrap;
   opacity: 0;
@@ -74,7 +79,7 @@
 .chapter-panel ul { overflow-y: auto; margin: 0; padding: 0; list-style: none; }
 .chapter-panel li button { padding: 12px 8px; justify-content: space-between; gap: 8px; border-radius: 4px; }
 .learning-nav .chapter-panel button > span { width: auto; opacity: 1; }
-.chapter-panel small { color: #82786a; white-space: nowrap; font-size: 11px; }
+.chapter-panel small { color: var(--appearance-nav-muted, #82786a); white-space: nowrap; font-size: 11px; }
 .learning-toast {
   position: fixed;
   top: 50%;
@@ -83,7 +88,7 @@
   z-index: var(--layer-toast);
   pointer-events: none;
   background: var(--learning-ink);
-  color: #faf8f3;
+  color: var(--appearance-surface, #faf8f3);
   border-radius: 7px;
   box-shadow: 0 4px 16px #574f4220;
   padding: 10px 18px;

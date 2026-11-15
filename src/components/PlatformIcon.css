@@ -1,0 +1,18 @@
+.platform-icon {
+  display: block;
+  background: var(--icon-black) center / contain no-repeat;
+}
+
+:root[data-theme='dark'] .platform-icon {
+  background-image: var(--icon-white);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='system'] .platform-icon {
+    background-image: var(--icon-white);
+  }
+}
+
+:root[data-palette='multicolor'] .platform-icon[data-icon-colored] {
+  background-image: var(--icon-color);
+}

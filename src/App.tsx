@@ -9,19 +9,24 @@ import { useTailPlayer } from './player/useTailPlayer'
 import LearningNavigation from './navigation/LearningNavigation'
 import { linkedListChapter } from './navigation/chapter'
 import AiWindow from './ai/AiWindow'
+import SettingsPage from './settings/SettingsPage'
+import { usePreferences } from './settings/preferences'
+import { useSettingsPage } from './settings/useSettingsPage'
 
 function App() {
   const [insertMethod, setInsertMethod] = useState<InsertMethod>('tail')
   const [language, setLanguage] = useState<CodeLanguage>('c')
   const player = useTailPlayer()
+  const [preferences, setPreferences] = usePreferences()
+  const { settingsOpen, openSettings, returnToLearning } = useSettingsPage()
   const supported = true
   const [aiWindowVisible, setAiWindowVisible] = useState(false)
 
   return (
     <div className="learning-shell">
-    <LearningNavigation chapter={linkedListChapter} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={() => { /* 配置真实知识点时在此接入现有演示状态。 */ }} />
+    <LearningNavigation chapter={linkedListChapter} onSettings={openSettings} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={() => { /* 配置真实知识点时在此接入现有演示状态。 */ }} />
     <AiWindow visible={aiWindowVisible} onClose={() => setAiWindowVisible(false)} context={{ chapterId: linkedListChapter.chapterId, chapterTitle: linkedListChapter.chapterTitle, language }} />
-    <main className="experiment-page">
+    <main className="experiment-page" hidden={settingsOpen}>
       <header className="page-header">
         <div>
           <h1>单链表创建</h1>
@@ -41,6 +46,7 @@ function App() {
       </div>
       <PlaybackControls player={player} />
     </main>
+    {settingsOpen && <SettingsPage preferences={preferences} onChange={setPreferences} onBack={returnToLearning} />}
     </div>
   )
 }

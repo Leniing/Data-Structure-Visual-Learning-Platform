@@ -12,8 +12,9 @@ it('opens knowledge only on click, keeps placeholders inert and maps menu action
   const root = createRoot(host)
   const openAi = vi.fn()
   const select = vi.fn()
+  const openSettings = vi.fn()
   try {
-    act(() => root.render(<LearningNavigation chapter={linkedListChapter} onOpenAi={openAi} onSelectKnowledge={select} />))
+    act(() => root.render(<LearningNavigation chapter={linkedListChapter} onOpenAi={openAi} onSelectKnowledge={select} onSettings={openSettings} />))
     const button = (name: string) => host.querySelector<HTMLButtonElement>(`button[aria-label="${name}"]`)!
     expect([...host.querySelectorAll('nav button[aria-label]')].map(node => node.getAttribute('aria-label'))).toEqual(['学习总览', '本章知识', 'AI 解答', '练习挑战', '设置'])
     act(() => button('本章知识').focus())
@@ -26,7 +27,7 @@ it('opens knowledge only on click, keeps placeholders inert and maps menu action
     act(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })))
     expect(host.querySelector('#chapter-knowledge')).toBeNull()
     expect(document.activeElement).toBe(button('本章知识'))
-    for (const name of ['学习总览', '练习挑战', '设置']) {
+    for (const name of ['学习总览', '练习挑战']) {
       act(() => button(name).click())
       expect(host.querySelector('[role="status"]')?.textContent).toBe('功能暂未开放')
     }
@@ -40,6 +41,12 @@ it('opens knowledge only on click, keeps placeholders inert and maps menu action
       act(() => vi.advanceTimersByTime(180))
       expect(host.querySelector('nav')?.classList.contains('expanded')).toBe(false)
     }
+    expect(openSettings).toHaveBeenCalledOnce()
+    const settings = button('设置')
+    act(() => settings.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })))
+    expect(settings.hasAttribute('data-hover-suppressed')).toBe(true)
+    act(() => settings.dispatchEvent(new MouseEvent('pointerout', { bubbles: true, relatedTarget: document.body })))
+    expect(settings.hasAttribute('data-hover-suppressed')).toBe(false)
     openAi.mockClear()
     act(() => {
       button('设置').blur()

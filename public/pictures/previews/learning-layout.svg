@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="64" viewBox="0 0 108 64">
+  <g id="learning-layout">
+    <rect x="1" y="1" width="106" height="62" rx="5" fill="var(--preview-surface, #fbfcff)" stroke="var(--preview-border, #c9d1df)" />
+    <path d="M6 1h18v62H6a5 5 0 0 1-5-5V6a5 5 0 0 1 5-5Z" fill="var(--preview-subtle, #e8eafb)" />
+    <g fill="none" stroke-width="2" stroke-linecap="round">
+      <path d="M7 12h11" stroke="var(--preview-swatch-first, var(--preview-accent, #4365af))" />
+      <path d="M7 21h11" stroke="var(--preview-swatch-second, var(--preview-accent, #32765d))" />
+      <path d="M7 30h11" stroke="var(--preview-swatch-third, var(--preview-accent, #9b551f))" />
+      <path d="M7 52h11" stroke="var(--preview-accent, #3d59aa)" />
+    </g>
+    <rect x="32" y="10" width="29" height="4" rx="2" fill="var(--preview-accent, #3d59aa)" />
+    <rect x="32" y="21" width="42" height="33" rx="3" fill="var(--preview-subtle, #e8eafb)" />
+    <rect x="80" y="21" width="17" height="11" rx="2" fill="var(--preview-accent, #3d59aa)" />
+    <rect x="80" y="37" width="17" height="17" rx="2" fill="var(--preview-subtle, #e8eafb)" />
+  </g>
+</svg>

@@ -1,0 +1,156 @@
+:root { color-scheme: light; }
+
+:root, [data-palette='sand'] {
+  --appearance-page: light-dark(#f3efe7, #221f1a);
+  --appearance-text: light-dark(#29251f, #f2ede3);
+  --appearance-muted: light-dark(#625d55, #c3b9a9);
+  --appearance-surface: light-dark(#faf8f3, #2c2822);
+  --appearance-border: light-dark(#c9c0b2, #62584a);
+  --appearance-ink: light-dark(#51483b, #e1d5c2);
+  --appearance-secondary: light-dark(#695c46, #cbb99b);
+  --appearance-strong: light-dark(#38332c, #e6ded0);
+  --appearance-field: light-dark(#fffefa, #322d26);
+  --appearance-placeholder: light-dark(#777066, #b6ab99);
+  --appearance-accent: light-dark(#574e40, #d0bda0);
+  --appearance-accent-text: light-dark(#fffefa, #27221b);
+  --appearance-subtle: light-dark(#f1ede5, #25211c);
+  --appearance-canvas: light-dark(#f6f2ea, #27231e);
+  --appearance-dots: light-dark(#d8d0c3, #4d4437);
+  --appearance-hover: light-dark(#eee7db, #3c342a);
+  --appearance-stroke: light-dark(#a99f90, #8a7b64);
+  --appearance-pointer: light-dark(#e9e1d3, #544635);
+  --appearance-code-border: light-dark(#d3cbbc, #544a3d);
+  --appearance-code-ink: light-dark(#3c3832, #e3dbcf);
+  --appearance-line-number: light-dark(#968b7b, #aa9b85);
+  --appearance-toggle: light-dark(#e8dfcf, #463a2c);
+  --appearance-highlight: light-dark(#e8d9ad, #574625);
+  --appearance-error: light-dark(#a52c21, #ff9d8e);
+  --appearance-error-text: light-dark(#8b2118, #ffc1b5);
+  --appearance-error-bg: light-dark(#f7d7d0, #563027);
+  --appearance-focus: light-dark(#347c65, #8bd0b8);
+  --appearance-nav-ink: light-dark(#574f42, #e1d5c2);
+  --appearance-nav-hover: light-dark(#ede8df, #3c342a);
+  --appearance-nav-focus: light-dark(#96836a, #d0bda0);
+  --appearance-nav-muted: light-dark(#82786a, #b6ab99);
+  --interface-font: 'DM Sans', 'Noto Sans SC', sans-serif;
+  --teaching-code-font: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+
+:root[data-theme='dark'] { color-scheme: dark; }
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='system'] { color-scheme: dark; }
+}
+
+[data-palette='multicolor'] {
+  --appearance-page: light-dark(#f3f4f8, #1c202a);
+  --appearance-text: light-dark(#282f40, #eef1f9);
+  --appearance-muted: light-dark(#535f75, #bec7da);
+  --appearance-surface: light-dark(#fbfcff, #252b39);
+  --appearance-border: light-dark(#c9d1df, #4e596e);
+  --appearance-ink: light-dark(#3f4d67, #d9e2f5);
+  --appearance-secondary: light-dark(#246b66, #8ed0c5);
+  --appearance-strong: light-dark(#303b50, #e4ebf8);
+  --appearance-field: light-dark(#fff, #2c3344);
+  --appearance-placeholder: light-dark(#626f85, #b0bdd3);
+  --appearance-accent: light-dark(#3d59aa, #adc0ff);
+  --appearance-accent-text: light-dark(#fff, #19264b);
+  --appearance-subtle: light-dark(#edf0f8, #212735);
+  --appearance-canvas: light-dark(#eef5f4, #212e34);
+  --appearance-dots: light-dark(#c4d9d5, #405b60);
+  --appearance-hover: light-dark(#e8eafb, #343953);
+  --appearance-stroke: light-dark(#84a6a1, #698e91);
+  --appearance-pointer: light-dark(#c7e0da, #385a58);
+  --appearance-code-border: light-dark(#cbd3e3, #48536b);
+  --appearance-code-ink: light-dark(#364360, #d9e3f9);
+  --appearance-line-number: light-dark(#626f89, #a4b3d3);
+  --appearance-toggle: light-dark(#e2e8fc, #374363);
+  --appearance-highlight: light-dark(#f7e3ad, #5e4a28);
+  --appearance-nav-ink: light-dark(#3f4d67, #d9e2f5);
+  --appearance-nav-hover: light-dark(#e7ebf2, #323a4b);
+  --appearance-nav-focus: light-dark(#586782, #b0bed7);
+  --appearance-nav-muted: light-dark(#626f85, #b0bdd3);
+  --learning-border: var(--appearance-border);
+}
+
+:root[data-palette='multicolor'] .experiment-page {
+  --appearance-secondary: var(--appearance-muted);
+  --appearance-accent: light-dark(#414c61, #c3ccdf);
+  --appearance-accent-text: light-dark(#fff, #222a38);
+  --appearance-canvas: light-dark(#f0f2f6, #222836);
+  --appearance-dots: light-dark(#ccd3df, #424e63);
+  --appearance-hover: light-dark(#e7ebf2, #323a4b);
+  --appearance-stroke: light-dark(#8995aa, #7c8ba4);
+  --appearance-pointer: light-dark(#dce2ed, #3a455a);
+  --appearance-toggle: light-dark(#e1e6ee, #364055);
+  --appearance-highlight: light-dark(#dfe5ef, #3e4a61);
+}
+
+[data-palette='sage'] {
+  --appearance-page: light-dark(#e9efe8, #1a211d);
+  --appearance-text: light-dark(#25322a, #edf5ed);
+  --appearance-muted: light-dark(#516456, #b6c9ba);
+  --appearance-surface: light-dark(#f6faf4, #222c25);
+  --appearance-border: light-dark(#b8c9ba, #516357);
+  --appearance-ink: light-dark(#365444, #cfe3d2);
+  --appearance-secondary: light-dark(#42634f, #a8c8af);
+  --appearance-strong: light-dark(#304b3a, #dcebe0);
+  --appearance-field: light-dark(#fbfdf9, #27362c);
+  --appearance-placeholder: light-dark(#5f7264, #a8bbac);
+  --appearance-accent: light-dark(#3b624c, #a4cdb0);
+  --appearance-accent-text: light-dark(#fbfdf9, #172a1d);
+  --appearance-subtle: light-dark(#e6efe5, #1e2822);
+  --appearance-canvas: light-dark(#eff5ed, #202b24);
+  --appearance-dots: light-dark(#c1d1c2, #43584a);
+  --appearance-hover: light-dark(#dce9dd, #304438);
+  --appearance-stroke: light-dark(#8ca793, #7d9c87);
+  --appearance-pointer: light-dark(#d5e5d7, #3a5746);
+  --appearance-code-border: light-dark(#c1d1c2, #465c4d);
+  --appearance-code-ink: light-dark(#31463a, #d5e6d9);
+  --appearance-line-number: light-dark(#657d6c, #a0b8a6);
+  --appearance-toggle: light-dark(#d0e2d2, #354d3f);
+  --appearance-highlight: light-dark(#cde4cf, #294f36);
+}
+
+[data-palette='slate'] {
+  --appearance-page: light-dark(#eaf0f6, #191f28);
+  --appearance-text: light-dark(#222f42, #edf2fb);
+  --appearance-muted: light-dark(#52647d, #b8c7db);
+  --appearance-surface: light-dark(#f6f9fd, #232d3b);
+  --appearance-border: light-dark(#bac9db, #4f637e);
+  --appearance-ink: light-dark(#3c5575, #cedef5);
+  --appearance-secondary: light-dark(#49668a, #a9c4e8);
+  --appearance-strong: light-dark(#314863, #e0ebf9);
+  --appearance-field: light-dark(#fcfdff, #293648);
+  --appearance-placeholder: light-dark(#62738a, #adbed6);
+  --appearance-accent: light-dark(#3f5c86, #a6c5f1);
+  --appearance-accent-text: light-dark(#fcfdff, #18273c);
+  --appearance-subtle: light-dark(#e5edf6, #1d2735);
+  --appearance-canvas: light-dark(#eef4fa, #202a37);
+  --appearance-dots: light-dark(#c4d0df, #435672);
+  --appearance-hover: light-dark(#dde8f5, #2f415b);
+  --appearance-stroke: light-dark(#8ca4c0, #7894b8);
+  --appearance-pointer: light-dark(#d9e5f3, #384f6b);
+  --appearance-code-border: light-dark(#c2d0e0, #455a76);
+  --appearance-code-ink: light-dark(#344960, #d7e6f9);
+  --appearance-line-number: light-dark(#667c96, #a1b7d3);
+  --appearance-toggle: light-dark(#d4e2f3, #354a66);
+  --appearance-highlight: light-dark(#d0e2f7, #314a6b);
+}
+
+:root:is([data-palette='sage'], [data-palette='slate']) {
+  --learning-ink: var(--appearance-ink);
+  --learning-hover: var(--appearance-hover);
+  --learning-border: var(--appearance-dots);
+}
+
+[data-interface-font='default'] { --interface-font: 'DM Sans', 'Noto Sans SC', sans-serif; }
+:root[data-interface-font='system'] { --canvas-value-font: system-ui, sans-serif; }
+:root[data-interface-font='serif'] { --canvas-value-font: Georgia, SimSun, serif; }
+
+[data-interface-font='system'] { --interface-font: system-ui, 'Microsoft YaHei', sans-serif; }
+[data-interface-font='serif'] { --interface-font: Georgia, 'Noto Serif CJK SC', SimSun, serif; }
+
+[data-code-font='jetbrains'] { --teaching-code-font: 'JetBrains Mono', Consolas, 'Courier New', monospace; }
+[data-code-font='consolas'] { --teaching-code-font: Consolas, 'Lucida Console', monospace; }
+[data-code-font='courier'] { --teaching-code-font: 'Courier New', Courier, monospace; }
