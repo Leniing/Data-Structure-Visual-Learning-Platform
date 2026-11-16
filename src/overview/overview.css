@@ -1,17 +1,16 @@
 .overview-page { height: 100dvh; display: flex; flex-direction: column; color: var(--appearance-text); background: var(--appearance-page); }
 .overview-header { flex-shrink: 0; width: min(1320px, 100%); margin: 0 auto; padding: 32px 36px 0; }
 .overview-title-row { display: flex; justify-content: space-between; align-items: center; gap: 28px; }
-.overview-eyebrow { color: var(--appearance-secondary); font-size: 12px; letter-spacing: .1em; margin-bottom: 10px; }
-.overview-page h1 { font-size: 30px; }
-.overview-intro { font-size: 14px; color: var(--appearance-muted); margin: 10px 0 0; }
-.overview-search { width: min(370px, 45%); flex-shrink: 0; }
-.overview-search span { display: block; font-size: 12px; margin-bottom: 8px; color: var(--appearance-muted); }
-.overview-search input { width: 100%; border: 1px solid var(--appearance-border); border-radius: 10px; padding: 13px 14px; background: var(--appearance-field); color: var(--appearance-text); font-size: 13px; }
+.overview-page h1 { font-size: 30px; margin: 0; }
+.overview-search { --search-inset: 14px; width: min(370px, 45%); flex-shrink: 0; }
+.overview-search-label { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; color: var(--appearance-secondary); font-size: 12px; line-height: 18px; }
+.overview-search-icon { display: block; width: 18px; height: 18px; flex-shrink: 0; }
+.overview-search input { width: 100%; border: 1px solid var(--appearance-border); border-radius: 10px; padding: 13px var(--search-inset); background: var(--appearance-field); color: var(--appearance-text); font-size: 13px; }
 .overview-search input::placeholder { color: var(--appearance-placeholder); }
-.overview-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+.overview-search input:focus::placeholder { color: transparent; }
+.overview-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--appearance-border); }
 .overview-filters button, .overview-empty button { padding: 8px 18px; border: 1px solid var(--appearance-border); border-radius: 8px; background: var(--appearance-surface); color: var(--appearance-muted); cursor: pointer; font-size: 13px; }
 .overview-filters button[aria-pressed='true'] { background: var(--appearance-accent); border-color: var(--appearance-accent); color: var(--appearance-accent-text); }
-.overview-count { display: flex; justify-content: space-between; gap: 12px; color: var(--appearance-muted); font-size: 12px; margin: 20px 0 0; padding-bottom: 15px; border-bottom: 1px solid var(--appearance-border); }
 .overview-scroll { overflow-y: auto; min-height: 0; flex: 1; scrollbar-gutter: stable; }
 .overview-grid { width: min(1320px, 100%); margin: 0 auto; padding: 24px 36px 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 22px; }
 .algorithm-card { position: relative; min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--appearance-border); border-radius: 16px; padding: 22px; background: var(--appearance-surface); transition: transform 180ms ease, box-shadow 180ms ease; }
@@ -31,5 +30,5 @@
 .overview-page :is(input, button, a):focus-visible, .overview-scroll:focus-visible { outline: 2px solid var(--appearance-focus); outline-offset: 4px; }
 .algorithm-card:focus-within { outline: 2px solid var(--appearance-focus); }
 @media (hover: hover) { .algorithm-card:hover { transform: translateY(-4px) scale(1.012); box-shadow: 0 12px 28px color-mix(in srgb, var(--appearance-ink) 14%, transparent); z-index: 1; } }
-@media (max-width: 720px) { .overview-header { padding: 20px 20px 0; } .overview-title-row { flex-direction: column; align-items: stretch; gap: 16px; } .overview-search { width: 100%; } .overview-grid { padding: 20px; gap: 16px; } .overview-filters { margin-top: 16px; gap: 6px; } .overview-filters button { padding: 7px 12px; } .overview-count span { display: none; } .overview-page h1 { font-size: 25px; } }
+@media (max-width: 720px) { .overview-header { padding: 20px 20px 0; } .overview-title-row { flex-direction: column; align-items: stretch; gap: 16px; } .overview-search { width: 100%; } .overview-grid { padding: 20px; gap: 16px; } .overview-filters { margin-top: 16px; padding-bottom: 16px; gap: 6px; } .overview-filters button { padding: 7px 12px; } .overview-page h1 { font-size: 25px; } }
 @media (prefers-reduced-motion: reduce) { .algorithm-card { transition: none; } .algorithm-card:hover { transform: none; } }

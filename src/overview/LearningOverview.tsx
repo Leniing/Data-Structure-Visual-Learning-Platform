@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import AlgorithmDiagram from './AlgorithmDiagram'
-import { algorithms, categories, filterAlgorithms, type Category } from './catalog'
+import { categories, filterAlgorithms, type Category } from './catalog'
 import './overview.css'
 
 export default function LearningOverview({ onNavigate }: { onNavigate: (route: string) => void }) {
@@ -12,15 +12,21 @@ export default function LearningOverview({ onNavigate }: { onNavigate: (route: s
   return <main className="overview-page">
     <header className="overview-header">
       <div className="overview-title-row">
-        <div><p className="overview-eyebrow">数据结构 · 算法学习</p><h1>学习总览</h1><p className="overview-intro">从结构到算法，找到你的下一个学习起点。</p></div>
-        <label className="overview-search"><span>搜索算法</span><input type="search" maxLength={100} value={query} placeholder="搜索名称或关键词，如 DFS、最小堆"
+        <h1>学习总览</h1>
+        <label className="overview-search">
+          <span className="overview-search-label">
+          <svg className="overview-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5 5" />
+          </svg>
+          <span>搜索算法</span>
+          </span>
+          <input type="search" aria-label="搜索算法" maxLength={100} value={query} placeholder="搜索名称或关键词，如 DFS、最小堆"
           onChange={event => { setQuery(event.target.value); resetScroll() }} /></label>
       </div>
       <div className="overview-filters" role="group" aria-label="算法分类">
         {(['全部', ...categories] as const).map(item => <button key={item} type="button" aria-pressed={category === item}
           onClick={() => { setCategory(item); resetScroll() }}>{item}</button>)}
       </div>
-      <p className="overview-count" role="status">{results.length} / {algorithms.length} 项算法与操作<span>已开放 1 项 · 持续完善中</span></p>
     </header>
     <div className="overview-scroll" ref={scroll} tabIndex={0} aria-label="算法卡片列表">
       {results.length ? <div className="overview-grid">{results.map(item => <article className="algorithm-card" key={item.id}>
