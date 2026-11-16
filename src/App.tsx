@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { type InsertMethod } from './algorithms/parseListInput'
 import CanvasPanel from './components/CanvasPanel'
 import InputPanel from './components/InputPanel'
@@ -12,6 +12,7 @@ import AiWindow from './ai/AiWindow'
 import SettingsPage from './settings/SettingsPage'
 import { usePreferences } from './settings/preferences'
 import { useSettingsPage } from './settings/useSettingsPage'
+import LearningOverview from './overview/LearningOverview'
 
 function App() {
   const [insertMethod, setInsertMethod] = useState<InsertMethod>('tail')
@@ -21,12 +22,25 @@ function App() {
   const { settingsOpen, openSettings, returnToLearning } = useSettingsPage()
   const supported = true
   const [aiWindowVisible, setAiWindowVisible] = useState(false)
+  const [overviewOpen, setOverviewOpen] = useState(() => window.location.hash === '#overview')
+  useEffect(() => {
+    const sync = () => { if (window.location.hash !== '#settings') setOverviewOpen(window.location.hash === '#overview') }
+    window.addEventListener('hashchange', sync)
+    window.addEventListener('popstate', sync)
+    return () => { window.removeEventListener('hashchange', sync); window.removeEventListener('popstate', sync) }
+  }, [])
+  const navigate = (route: string) => {
+    if (window.location.hash !== route) window.history.pushState(null, '', route)
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    if (player.playing) player.toggle()
+  }
 
   return (
     <div className="learning-shell">
-    <LearningNavigation chapter={linkedListChapter} onSettings={openSettings} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={() => { /* 配置真实知识点时在此接入现有演示状态。 */ }} />
+    <LearningNavigation chapter={linkedListChapter} onOverview={() => navigate('#overview')} overviewOpen={overviewOpen && !settingsOpen} onSettings={openSettings} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={() => { /* 配置真实知识点时在此接入现有演示状态。 */ }} />
     <AiWindow visible={aiWindowVisible} onClose={() => setAiWindowVisible(false)} context={{ chapterId: linkedListChapter.chapterId, chapterTitle: linkedListChapter.chapterTitle, language }} />
-    <main className="experiment-page" hidden={settingsOpen}>
+    {overviewOpen && <div hidden={settingsOpen}><LearningOverview onNavigate={navigate} /></div>}
+    <main className="experiment-page" hidden={settingsOpen || overviewOpen}>
       <header className="page-header">
         <div>
           <h1>单链表创建</h1>

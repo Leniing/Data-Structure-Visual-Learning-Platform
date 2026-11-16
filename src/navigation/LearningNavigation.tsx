@@ -10,10 +10,12 @@ interface Props {
   onSelectKnowledge: (item: KnowledgeItem) => void
   onSettings: () => void
   settingsOpen?: boolean
+  onOverview?: () => void
+  overviewOpen?: boolean
   timings?: typeof navigationTiming
 }
 
-export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledge, onSettings, settingsOpen, timings = navigationTiming }: Props) {
+export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledge, onSettings, settingsOpen, onOverview: openOverview, overviewOpen, timings = navigationTiming }: Props) {
   const [settingsHoverSuppressed, setSettingsHoverSuppressed] = useState(false)
   const [navExpanded, setNavExpanded] = useState(false)
   const [chapterPanelOpen, setChapterPanelOpen] = useState(false)
@@ -35,7 +37,7 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
     setToastVisible(true)
     toastTimer.current = setTimeout(() => setToastVisible(false), timings.toast)
   }
-  const onOverview = () => notify('功能暂未开放')
+  const onOverview = openOverview ?? (() => notify('功能暂未开放'))
   const onPractice = () => notify('功能暂未开放')
   const closeChapter = () => {
     clearTimeout(panelTimer.current)
@@ -120,7 +122,7 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
         }
       }}>
       <div className="nav-top">
-        <button type="button" aria-label="学习总览" onClick={() => run(onOverview)}><PlatformIcon name="learning-overview" colored /><span>学习总览</span></button>
+        <button type="button" aria-label="学习总览" aria-current={overviewOpen ? 'page' : undefined} onClick={() => run(onOverview)}><PlatformIcon name="learning-overview" colored /><span>学习总览</span></button>
         <div className="knowledge-anchor" onPointerEnter={() => clearTimeout(panelTimer.current)} onPointerLeave={(event) => { if (event.pointerType !== 'touch') schedulePanelClose() }}
           onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) schedulePanelClose() }}>
           <button ref={knowledgeButton} type="button" aria-label="本章知识" aria-expanded={chapterPanelOpen} aria-controls="chapter-knowledge"
