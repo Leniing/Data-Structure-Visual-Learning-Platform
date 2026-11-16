@@ -117,3 +117,35 @@ it('opens knowledge only on click, navigates available knowledge and keeps unava
     vi.useRealTimers()
   }
 })
+
+
+it('opens all categories collapsed in overview and restores the current category in learning', () => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+  const host = document.createElement('div')
+  const root = createRoot(host)
+  const render = (overviewOpen: boolean) => act(() => root.render(
+    <LearningNavigation chapter={linkedListChapter} overviewOpen={overviewOpen}
+      onOpenAi={() => {}} onSelectKnowledge={() => {}} onSettings={() => {}} />,
+  ))
+  const togglePanel = () => act(() => host.querySelector<HTMLButtonElement>('button[aria-label="本章知识"]')!.click())
+  try {
+    render(true)
+    togglePanel()
+    expect(host.querySelectorAll('.chapter-toggle[aria-expanded="true"]')).toHaveLength(0)
+    act(() => host.querySelector<HTMLButtonElement>('.chapter-toggle')!.click())
+    expect(host.querySelectorAll('.chapter-toggle[aria-expanded="true"]')).toHaveLength(1)
+    togglePanel()
+    togglePanel()
+    expect(host.querySelectorAll('.chapter-toggle[aria-expanded="true"]')).toHaveLength(0)
+    togglePanel()
+    render(false)
+    togglePanel()
+    expect([...host.querySelectorAll('.chapter-toggle[aria-expanded="true"]')].map(node => node.textContent)).toEqual(['链表'])
+    togglePanel()
+    render(true)
+    togglePanel()
+    expect(host.querySelectorAll('.chapter-toggle[aria-expanded="true"]')).toHaveLength(0)
+  } finally {
+    act(() => root.unmount())
+  }
+})

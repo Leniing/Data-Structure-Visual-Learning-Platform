@@ -19,7 +19,7 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
   const [settingsHoverSuppressed, setSettingsHoverSuppressed] = useState(false)
   const [navExpanded, setNavExpanded] = useState(false)
   const [chapterPanelOpen, setChapterPanelOpen] = useState(false)
-  const [expandedChapterIds, setExpandedChapterIds] = useState<string[]>([chapter.chapterId])
+  const [expandedChapterIds, setExpandedChapterIds] = useState<string[]>([])
   const [toast, setToast] = useState('')
   const [toastVisible, setToastVisible] = useState(false)
   const nav = useRef<HTMLElement>(null)
@@ -127,7 +127,7 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
         <div className="knowledge-anchor" onPointerEnter={() => clearTimeout(panelTimer.current)} onPointerLeave={(event) => { if (event.pointerType !== 'touch') schedulePanelClose() }}
           onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) schedulePanelClose() }}>
           <button ref={knowledgeButton} type="button" aria-label="本章知识" aria-expanded={chapterPanelOpen} aria-controls="chapter-knowledge"
-            onClick={() => { clearTimeout(panelTimer.current); setNavExpanded(true); if (!chapterPanelOpen) setExpandedChapterIds([chapter.chapterId]); setChapterPanelOpen(!chapterPanelOpen) }}>
+            onClick={() => { clearTimeout(panelTimer.current); setNavExpanded(true); if (!chapterPanelOpen) setExpandedChapterIds(overviewOpen ? [] : [chapter.chapterId]); setChapterPanelOpen(!chapterPanelOpen) }}>
             <PlatformIcon name="knowledge" colored /><span>本章知识</span>
           </button>
           {chapterPanelOpen && <div ref={panel} id="chapter-knowledge" className="chapter-panel" role="region" aria-label="本章知识"
