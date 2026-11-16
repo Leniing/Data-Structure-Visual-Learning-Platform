@@ -4,7 +4,7 @@ import { expect, it, vi } from 'vitest'
 import LearningNavigation from './LearningNavigation'
 import { linkedListChapter } from './chapter'
 
-it('opens knowledge only on click, keeps placeholders inert and maps menu actions', () => {
+it('opens knowledge only on click, navigates available knowledge and keeps unavailable entries inert and maps menu actions', () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
   vi.useFakeTimers()
   const host = document.createElement('div')
@@ -20,10 +20,41 @@ it('opens knowledge only on click, keeps placeholders inert and maps menu action
     act(() => button('本章知识').focus())
     expect(host.querySelector('#chapter-knowledge')).toBeNull()
     act(() => button('本章知识').click())
-    expect(host.querySelectorAll('.chapter-panel li')).toHaveLength(6)
-    act(() => host.querySelector<HTMLButtonElement>('.chapter-panel li button')!.click())
+    expect(host.querySelector('.chapter-panel h2')?.textContent).toBe('本章知识')
+    expect(host.querySelectorAll('.chapter-panel ul:not([hidden]) li')).toHaveLength(4)
+    act(() => host.querySelector<HTMLButtonElement>('.chapter-panel ul:not([hidden]) li button')!.click())
+    expect(select).toHaveBeenCalledWith(expect.objectContaining({ title: '单链表创建', route: '#linked-list-creation' }))
+    expect(host.querySelector('#chapter-knowledge')).toBeNull()
+    act(() => button('本章知识').click())
+    select.mockClear()
+    act(() => host.querySelectorAll<HTMLButtonElement>('.chapter-panel ul:not([hidden]) li button')[1].click())
     expect(select).not.toHaveBeenCalled()
-    expect(host.querySelector('[role="status"]')?.textContent).toBe('知识点暂未配置')
+    expect(host.querySelector('[role="status"]')?.textContent).toBe('该知识点暂未开放')
+    const toggles = [...host.querySelectorAll<HTMLButtonElement>('.chapter-toggle')]
+    expect(toggles.map(toggle => toggle.textContent)).toEqual(['链表', '栈', '队列', '树', '查找', '图', '排序'])
+    expect(toggles.map(toggle => toggle.getAttribute('aria-expanded'))).toEqual(['true', 'false', 'false', 'false', 'false', 'false', 'false'])
+    expect(host.querySelector('select')).toBeNull()
+    for (const [name, count, groups] of [
+      ['栈', 3, []], ['队列', 5, []],
+      ['树', 11, ['二叉树', '二叉搜索树', '堆（最大堆 / 最小堆）']],
+      ['查找', 3, []], ['图', 6, ['图遍历', '最小生成树', '最短路径']], ['排序', 6, []],
+    ] as const) {
+      const toggle = toggles.find(node => node.textContent === name)!
+      const category = toggle.closest('section')!
+      act(() => toggle.click())
+      expect(toggle.getAttribute('aria-expanded')).toBe('true')
+      expect(category.querySelector('ul')!.hidden).toBe(false)
+      expect(category.querySelectorAll('li')).toHaveLength(count)
+      expect([...category.querySelectorAll('.chapter-group')].map(node => node.textContent)).toEqual(groups)
+      expect(toggles[0].getAttribute('aria-expanded')).toBe('true')
+      act(() => toggle.click())
+      expect(category.querySelector('ul')!.hidden).toBe(true)
+    }
+    act(() => toggles[0].click())
+    expect(host.querySelectorAll('.chapter-panel ul:not([hidden])')).toHaveLength(0)
+    act(() => button('本章知识').click())
+    act(() => button('本章知识').click())
+    expect(host.querySelector('.chapter-toggle')!.getAttribute('aria-expanded')).toBe('true')
     act(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })))
     expect(host.querySelector('#chapter-knowledge')).toBeNull()
     expect(document.activeElement).toBe(button('本章知识'))

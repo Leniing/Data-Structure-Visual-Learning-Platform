@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import PlatformIcon from '../components/PlatformIcon'
-import type { Chapter, KnowledgeItem } from './chapter'
+import { chapters, type Chapter, type KnowledgeItem } from './chapter'
 import './navigation.css'
 import { navigationTiming } from './timing'
 
@@ -19,6 +19,7 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
   const [settingsHoverSuppressed, setSettingsHoverSuppressed] = useState(false)
   const [navExpanded, setNavExpanded] = useState(false)
   const [chapterPanelOpen, setChapterPanelOpen] = useState(false)
+  const [expandedChapterIds, setExpandedChapterIds] = useState<string[]>([chapter.chapterId])
   const [toast, setToast] = useState('')
   const [toastVisible, setToastVisible] = useState(false)
   const nav = useRef<HTMLElement>(null)
@@ -126,18 +127,33 @@ export default function LearningNavigation({ chapter, onOpenAi, onSelectKnowledg
         <div className="knowledge-anchor" onPointerEnter={() => clearTimeout(panelTimer.current)} onPointerLeave={(event) => { if (event.pointerType !== 'touch') schedulePanelClose() }}
           onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) schedulePanelClose() }}>
           <button ref={knowledgeButton} type="button" aria-label="本章知识" aria-expanded={chapterPanelOpen} aria-controls="chapter-knowledge"
-            onClick={() => { clearTimeout(panelTimer.current); setNavExpanded(true); setChapterPanelOpen(!chapterPanelOpen) }}>
+            onClick={() => { clearTimeout(panelTimer.current); setNavExpanded(true); if (!chapterPanelOpen) setExpandedChapterIds([chapter.chapterId]); setChapterPanelOpen(!chapterPanelOpen) }}>
             <PlatformIcon name="knowledge" colored /><span>本章知识</span>
           </button>
           {chapterPanelOpen && <div ref={panel} id="chapter-knowledge" className="chapter-panel" role="region" aria-label="本章知识"
             onFocus={() => clearTimeout(panelTimer.current)}>
-            <h2>{chapter.chapterTitle}</h2>
-            <ul>{chapter.items.map(item => <li key={item.id}>
-              <button type="button" onClick={() => {
-                if (item.status === 'placeholder') notify('知识点暂未配置')
-                else { onSelectKnowledge(item); closeChapter() }
-              }}><span>{item.title}</span>{item.status === 'placeholder' && <small>待配置</small>}</button>
-            </li>)}</ul>
+            <h2>本章知识</h2>
+            <div className="chapter-scroll">
+              {chapters.map((category, categoryIndex) => {
+                const expanded = expandedChapterIds.includes(category.chapterId)
+                const contentId = `chapter-category-${categoryIndex}`
+                return <section className="chapter-category" key={category.chapterId}>
+                  <h3><button type="button" className="chapter-toggle" aria-expanded={expanded} aria-controls={contentId}
+                    onClick={() => setExpandedChapterIds(ids => expanded
+                      ? ids.filter(id => id !== category.chapterId) : [...ids, category.chapterId])}>
+                    <svg className="chapter-triangle" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2 9 6 4 10Z" fill="currentColor" /></svg>
+                    <span>{category.chapterTitle}</span>
+                  </button></h3>
+                  <ul id={contentId} hidden={!expanded}>{category.items.map((item, index) => <li key={item.id}>
+                    {item.group && item.group !== category.items[index - 1]?.group && <h4 className="chapter-group">{item.group}</h4>}
+                    <button type="button" onClick={() => {
+                      if (item.status === 'unavailable') notify('该知识点暂未开放')
+                      else { onSelectKnowledge(item); closeChapter() }
+                    }}><span>{item.title}</span>{item.status === 'unavailable' && <small>暂未开放</small>}</button>
+                  </li>)}</ul>
+                </section>
+              })}
+            </div>
           </div>}
         </div>
         <button type="button" aria-label="AI 解答" onClick={() => run(onOpenAi)}><PlatformIcon name="ai-answer" colored /><span>AI 解答</span></button>

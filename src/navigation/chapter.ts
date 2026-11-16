@@ -1,7 +1,10 @@
+import { algorithms, categories } from '../overview/catalog'
+
 export interface KnowledgeItem {
   id: string
   title: string
-  status: 'placeholder' | 'configured'
+  status: 'unavailable' | 'configured'
+  group?: string
   route?: string
 }
 
@@ -11,12 +14,20 @@ export interface Chapter {
   items: KnowledgeItem[]
 }
 
-export const linkedListChapter: Chapter = {
-  chapterId: 'linked-list-creation',
-  chapterTitle: '单链表创建',
-  items: Array.from({ length: 6 }, (_, index) => ({
-    id: `knowledge-${index + 1}`,
-    title: `知识点占位 ${String(index + 1).padStart(2, '0')}`,
-    status: 'placeholder',
+export const chapters: Chapter[] = categories.map(category => ({
+  chapterId: category,
+  chapterTitle: category,
+  items: algorithms.filter(item => item.category === category).map((item, index) => ({
+    id: item.id,
+    title: item.name,
+    status: item.route ? 'configured' : 'unavailable',
+    route: item.route,
+    group: category === '树'
+      ? index < 5 ? '二叉树' : index < 8 ? '二叉搜索树' : '堆（最大堆 / 最小堆）'
+      : category === '图'
+        ? index < 2 ? '图遍历' : index < 4 ? '最小生成树' : '最短路径'
+        : undefined,
   })),
-}
+}))
+
+export const linkedListChapter = chapters[0]

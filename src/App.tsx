@@ -37,8 +37,8 @@ function App() {
 
   return (
     <div className="learning-shell">
-    <LearningNavigation chapter={linkedListChapter} onOverview={() => navigate('#overview')} overviewOpen={overviewOpen && !settingsOpen} onSettings={openSettings} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={() => { /* 配置真实知识点时在此接入现有演示状态。 */ }} />
-    <AiWindow visible={aiWindowVisible} onClose={() => setAiWindowVisible(false)} context={{ chapterId: linkedListChapter.chapterId, chapterTitle: linkedListChapter.chapterTitle, language }} />
+    <LearningNavigation chapter={linkedListChapter} onOverview={() => navigate('#overview')} overviewOpen={overviewOpen && !settingsOpen} onSettings={openSettings} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={item => { if (item.route) navigate(item.route) }} />
+    <AiWindow visible={aiWindowVisible} onClose={() => setAiWindowVisible(false)} context={{ chapterId: 'linked-list-creation', chapterTitle: '单链表创建', language }} />
     {overviewOpen && <div hidden={settingsOpen}><LearningOverview onNavigate={navigate} /></div>}
     <main className="experiment-page" hidden={settingsOpen || overviewOpen}>
       <header className="page-header">
