@@ -66,6 +66,7 @@ it('restores every visual/code/result snapshot, keeps language steps, and resets
       }
       expect(snapshot().result).toBe('返回值：节点11')
       expect(snapshot().status).toMatch(/步 · 查找完成$/)
+      expect(page().querySelector('[aria-current="step"]')).toBeNull()
       for (let n = snapshots.length - 2; n >= 0; n--) { click('上一步'); expect(snapshot()).toEqual(snapshots[n]) }
       click('重置'); expect(snapshot()).toEqual(initial)
       expect(page().querySelector('input')!.readOnly).toBe(false)

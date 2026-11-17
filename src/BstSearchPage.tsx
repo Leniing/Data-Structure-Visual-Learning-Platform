@@ -37,7 +37,7 @@ export default function BstSearchPage({ active, language, onLanguageChange }: {
         </form>
       </section>
       <BstCanvas key={canvasVersion} method={method} onMethodChange={next => { if (next !== method) { reset(); setMethod(next) } }} step={player.current} />
-      <CodePanel language={language} onLanguageChange={onLanguageChange} activeLineId={player.current?.line ?? null} condition={player.current?.condition ?? null} lesson={{ lines: getBstCode(method, language), label: method === 'recursive' ? '递归查找' : '非递归查找' }} />
+      <CodePanel language={language} onLanguageChange={onLanguageChange} activeLineId={player.atEnd ? null : player.current?.line ?? null} condition={player.current?.condition ?? null} lesson={{ lines: getBstCode(method, language), label: method === 'recursive' ? '递归查找' : '非递归查找' }} />
     </div>
     <PlaybackControls player={{ ...player, reset }} activity="查找" allowEmptyReset />
   </main>
