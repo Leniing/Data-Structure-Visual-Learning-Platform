@@ -7,12 +7,14 @@ import CodePanel from './teaching/CodePanel'
 import type { CodeLanguage } from './teaching/linkedListCode'
 import { useTailPlayer } from './player/useTailPlayer'
 import LearningNavigation from './navigation/LearningNavigation'
-import { linkedListChapter } from './navigation/chapter'
+import { chapters, linkedListChapter } from './navigation/chapter'
 import AiWindow from './ai/AiWindow'
 import SettingsPage from './settings/SettingsPage'
 import { usePreferences } from './settings/preferences'
 import { useSettingsPage } from './settings/useSettingsPage'
 import LearningOverview from './overview/LearningOverview'
+
+import BstSearchPage from './BstSearchPage'
 
 function App() {
   const [insertMethod, setInsertMethod] = useState<InsertMethod>('tail')
@@ -22,9 +24,15 @@ function App() {
   const { settingsOpen, openSettings, returnToLearning } = useSettingsPage()
   const supported = true
   const [aiWindowVisible, setAiWindowVisible] = useState(false)
+  const [lessonRoute, setLessonRoute] = useState(() => window.location.hash === '#bst-search' ? '#bst-search' : '#linked-list-creation')
+  const bstOpen = lessonRoute === '#bst-search'
   const [overviewOpen, setOverviewOpen] = useState(() => window.location.hash === '#overview')
   useEffect(() => {
-    const sync = () => { if (window.location.hash !== '#settings') setOverviewOpen(window.location.hash === '#overview') }
+    const sync = () => {
+      const hash = window.location.hash
+      if (hash !== '#settings') setOverviewOpen(hash === '#overview')
+      if (hash !== '#settings' && hash !== '#overview') setLessonRoute(hash === '#bst-search' ? hash : '#linked-list-creation')
+    }
     window.addEventListener('hashchange', sync)
     window.addEventListener('popstate', sync)
     return () => { window.removeEventListener('hashchange', sync); window.removeEventListener('popstate', sync) }
@@ -37,10 +45,10 @@ function App() {
 
   return (
     <div className="learning-shell">
-    <LearningNavigation chapter={linkedListChapter} onOverview={() => navigate('#overview')} overviewOpen={overviewOpen && !settingsOpen} onSettings={openSettings} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={item => { if (item.route) navigate(item.route) }} />
-    <AiWindow visible={aiWindowVisible} onClose={() => setAiWindowVisible(false)} context={{ chapterId: 'linked-list-creation', chapterTitle: '单链表创建', language }} />
+    <LearningNavigation chapter={bstOpen ? chapters.find(chapter => chapter.chapterId === '树')! : linkedListChapter} onOverview={() => navigate('#overview')} overviewOpen={overviewOpen && !settingsOpen} onSettings={openSettings} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={item => { if (item.route) navigate(item.route) }} />
+    <AiWindow visible={aiWindowVisible} onClose={() => setAiWindowVisible(false)} context={{ chapterId: bstOpen ? 'bst-search' : 'linked-list-creation', chapterTitle: bstOpen ? '二叉搜索树查找' : '单链表创建', language }} />
     {overviewOpen && <div hidden={settingsOpen}><LearningOverview onNavigate={navigate} /></div>}
-    <main className="experiment-page" hidden={settingsOpen || overviewOpen}>
+    {!bstOpen && <main className="experiment-page" hidden={settingsOpen || overviewOpen}>
       <header className="page-header">
         <div>
           <h1>单链表创建</h1>
@@ -59,7 +67,8 @@ function App() {
         <CodePanel insertMethod={insertMethod} language={language} onLanguageChange={(next) => { if (next !== language) { player.reset(); setLanguage(next) } }} activeLineId={player.current?.codeLineId ?? null} condition={player.current?.condition ?? null} />
       </div>
       <PlaybackControls player={player} />
-    </main>
+    </main>}
+    {bstOpen && <BstSearchPage active={!settingsOpen && !overviewOpen} language={language} onLanguageChange={setLanguage} />}
     {settingsOpen && <SettingsPage preferences={preferences} onChange={setPreferences} onBack={returnToLearning} />}
     </div>
   )

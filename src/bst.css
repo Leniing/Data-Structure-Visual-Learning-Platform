@@ -1,0 +1,15 @@
+.bst-page { --bst-amber: light-dark(#ad700d, #edb95e); --bst-purple: light-dark(#8055b5, #bd9ae8); }
+.bst-node.current { fill: light-dark(#efbe61, #916516); }
+.bst-node.visited { fill: light-dark(#f5e2b9, #59482d); }
+.bst-node.found { fill: light-dark(#b8ddc2, #345e44); }
+.bst-null.failed { fill: light-dark(#b74f50, #efa6a6); }
+.bst-edge { stroke: var(--appearance-secondary, #695c46); stroke-width: 1.8; }
+.bst-edge.visited, .bst-motion-arrow.down { stroke: var(--bst-amber); }
+.bst-motion-arrow { stroke-width: 2.5; }
+.bst-motion-arrow.return { stroke: var(--bst-purple); }
+.bst-arrow-head.down { fill: var(--bst-amber); }
+.bst-arrow-head.return { fill: var(--bst-purple); }
+.bst-input-lines { flex: 1; min-width: 0; border: 1px solid var(--appearance-border); border-radius: 4px; background: var(--appearance-field); }
+.bst-input-lines input { min-height: 30px; border: 0; background: transparent; font: 14px/1.5 Consolas, monospace; }
+.bst-input-lines output { display: block; padding: 3px 12px 7px; font-size: 13px; }
+.bst-page input:focus-visible { outline: 2px solid var(--appearance-focus); }

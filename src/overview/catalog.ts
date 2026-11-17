@@ -34,7 +34,7 @@ const groups: [Category, [string, string, string, string?][]][] = [
     ['二叉树中序遍历', '按照左、根、右的顺序访问二叉树。', 'inorder DFS 深度优先'],
     ['二叉树后序遍历', '按照左、右、根的顺序访问二叉树。', 'postorder DFS 深度优先'],
     ['二叉树层序遍历', '借助队列，从上到下逐层访问节点。', 'level order BFS 广度优先'],
-    ['二叉搜索树查找', '比较节点值，逐步缩小到左子树或右子树。', 'BST search 二叉排序树'],
+    ['二叉搜索树查找', '比较节点值，逐步缩小到左子树或右子树。', 'BST search 二叉排序树', '#bst-search'],
     ['二叉搜索树插入', '沿比较路径定位空位，保持左小右大的性质。', 'BST insert 二叉排序树'],
     ['二叉搜索树删除', '根据孩子数量处理删除，并保持搜索树有序。', 'BST delete 二叉排序树 后继'],
     ['建堆', '从非叶节点向下调整，建立最大堆或最小堆。', 'heap heapify 最大堆 最小堆'],
@@ -71,5 +71,5 @@ export const algorithms: Algorithm[] = groups.flatMap(([category, entries], grou
 export function filterAlgorithms(query: string, category: Category | '全部') {
   const terms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean)
   return algorithms.filter(item => (category === '全部' || item.category === category) && terms.every(term =>
-    `${item.name} ${item.category} ${item.description} ${item.keywords}`.toLocaleLowerCase().includes(term)))
+    `${item.name} ${item.category} ${item.description} ${item.keywords}`.toLocaleLowerCase().includes(term))).sort((a, b) => Number(Boolean(b.route)) - Number(Boolean(a.route)))
 }

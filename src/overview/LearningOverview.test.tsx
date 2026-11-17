@@ -16,7 +16,7 @@ it('connects overview, filters, settings and the available lesson through hash n
   try {
     act(() => root.render(<App />))
     expect(host.querySelectorAll('.algorithm-card')).toHaveLength(38)
-    expect(host.querySelectorAll('.algorithm-card a')).toHaveLength(1)
+    expect(host.querySelectorAll('.algorithm-card a')).toHaveLength(2)
     click('图')
     expect(host.querySelectorAll('.algorithm-card')).toHaveLength(6)
     click('设置')

@@ -36,7 +36,7 @@ it('opens knowledge only on click, navigates available knowledge and keeps unava
     expect(host.querySelector('select')).toBeNull()
     for (const [name, count, groups] of [
       ['栈', 3, []], ['队列', 5, []],
-      ['树', 11, ['二叉树', '二叉搜索树', '堆（最大堆 / 最小堆）']],
+      ['树', 11, ['二叉搜索树', '二叉树', '二叉搜索树', '堆（最大堆 / 最小堆）']],
       ['查找', 3, []], ['图', 6, ['图遍历', '最小生成树', '最短路径']], ['排序', 6, []],
     ] as const) {
       const toggle = toggles.find(node => node.textContent === name)!

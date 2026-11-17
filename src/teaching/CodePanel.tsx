@@ -1,16 +1,17 @@
 import { useEffect, useRef } from 'react'
 import type { InsertMethod } from '../algorithms/parseListInput'
-import { getLinkedListCode, type CodeLanguage } from './linkedListCode'
+import { getLinkedListCode, type CodeLanguage, type CodeLine } from './linkedListCode'
 
 interface CodePanelProps {
-  insertMethod: InsertMethod
+  insertMethod?: InsertMethod
+  lesson?: { lines: readonly CodeLine[]; label: string }
   activeLineId: string | null
   condition: boolean | null
   language: CodeLanguage
   onLanguageChange: (language: CodeLanguage) => void
 }
 
-export default function CodePanel({ insertMethod, activeLineId, condition, language, onLanguageChange }: CodePanelProps) {
+export default function CodePanel({ insertMethod = 'tail', lesson, activeLineId, condition, language, onLanguageChange }: CodePanelProps) {
   const scroller = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const container = scroller.current
@@ -21,9 +22,9 @@ export default function CodePanel({ insertMethod, activeLineId, condition, langu
         container.scrollTop = Math.max(0, top - container.clientHeight / 2)
       }
     }
-  }, [activeLineId])
-  const codeLines = getLinkedListCode(insertMethod, language)
-  const methodLabel = insertMethod === 'head' ? '头插法' : '尾插法'
+  }, [activeLineId, language])
+  const codeLines = lesson?.lines ?? getLinkedListCode(insertMethod, language)
+  const methodLabel = lesson?.label ?? (insertMethod === 'head' ? '头插法' : '尾插法')
   const languageLabel = language === 'c' ? 'C' : 'C++'
   const codeTitle = `${language === 'c' ? 'C语言' : languageLabel} ${methodLabel}`
 

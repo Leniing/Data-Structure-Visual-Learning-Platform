@@ -2,14 +2,16 @@ import type { useTailPlayer } from './useTailPlayer'
 
 import PlatformIcon from '../components/PlatformIcon'
 
-export default function PlaybackControls({ player }: { player: ReturnType<typeof useTailPlayer> }) {
+type PlaybackPlayer = Pick<ReturnType<typeof useTailPlayer>, 'total' | 'index' | 'playing' | 'atEnd' | 'speed' | 'reset' | 'move' | 'toggle' | 'setSpeed'>
+
+export default function PlaybackControls({ player, status }: { player: PlaybackPlayer; status?: string }) {
   const { total, index, playing, atEnd, speed, reset, move, toggle, setSpeed } = player
   const toggleLabel = playing ? '暂停' : atEnd ? '重播' : '继续'
   return (
     <section className="playback-panel panel" aria-labelledby="playback-title">
       <div>
         <h2 id="playback-title">播放控制</h2>
-        <p className="muted">{total ? `${index + 1} / ${total} 步 · ${atEnd ? '创建完成' : playing ? '播放中' : '已暂停'}` : '等待创建'}</p>
+        <p className="muted">{status ?? (total ? `${index + 1} / ${total} 步 · ${atEnd ? '创建完成' : playing ? '播放中' : '已暂停'}` : '等待创建')}</p>
       </div>
       <div className="playback-buttons" role="group" aria-label="播放操作">
         <button type="button" aria-label="重置" title="重置" disabled={!total} onClick={reset}>

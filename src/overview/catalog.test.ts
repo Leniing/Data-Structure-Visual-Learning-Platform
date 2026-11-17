@@ -1,11 +1,21 @@
 import { expect, it } from 'vitest'
 import { algorithms, categories, filterAlgorithms } from './catalog'
 
+it('stably prioritizes open lessons without changing IDs after search and filtering', () => {
+  for (const [query, category] of [['', '全部'], ['', '树'], ['二叉', '树']] as const) {
+    const result = filterAlgorithms(query, category)
+    const open = result.filter(item => item.route)
+    expect(result.slice(0, open.length)).toEqual(open)
+    expect(result.filter(item => !item.route)).toEqual(algorithms.filter(item => result.includes(item) && !item.route))
+  }
+  expect(algorithms.find(item => item.route === '#bst-search')?.id).toBe('3-5')
+})
+
 it('covers all 38 operations with only the implemented lesson open', () => {
   expect(algorithms).toHaveLength(38)
   expect(new Set(algorithms.map(item => item.name)).size).toBe(38)
   expect(categories.map(category => filterAlgorithms('', category).length)).toEqual([4, 3, 5, 11, 3, 6, 6])
-  expect(algorithms.filter(item => item.route).map(item => item.name)).toEqual(['单链表创建'])
+  expect(algorithms.filter(item => item.route).map(item => item.name)).toEqual(['单链表创建', '二叉搜索树查找'])
 })
 
 it('combines category and case-insensitive keyword search', () => {

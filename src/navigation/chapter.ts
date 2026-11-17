@@ -17,7 +17,7 @@ export interface Chapter {
 export const chapters: Chapter[] = categories.map(category => ({
   chapterId: category,
   chapterTitle: category,
-  items: algorithms.filter(item => item.category === category).map((item, index) => ({
+  items: algorithms.filter(item => item.category === category).map((item, index): KnowledgeItem => ({
     id: item.id,
     title: item.name,
     status: item.route ? 'configured' : 'unavailable',
@@ -27,7 +27,7 @@ export const chapters: Chapter[] = categories.map(category => ({
       : category === '图'
         ? index < 2 ? '图遍历' : index < 4 ? '最小生成树' : '最短路径'
         : undefined,
-  })),
+  })).sort((a, b) => Number(Boolean(b.route)) - Number(Boolean(a.route))),
 }))
 
 export const linkedListChapter = chapters[0]
