@@ -14,6 +14,8 @@ export default function BstSearchPage({ active, language, onLanguageChange }: {
   const [method, setMethod] = useState<BstMethod>('recursive')
   const [input, setInput] = useState('11')
   const player = useBstPlayer(active)
+  const [canvasVersion, setCanvasVersion] = useState(0)
+  const reset = () => { player.reset(); setCanvasVersion(version => version + 1) }
   const parsed = parseSearchValue(input)
   const result = player.current?.result
   const resultText = result == null ? '—' : result === 'NULL' ? 'NULL' : `节点${result}`
@@ -34,9 +36,9 @@ export default function BstSearchPage({ active, language, onLanguageChange }: {
           </div>
         </form>
       </section>
-      <BstCanvas method={method} onMethodChange={next => { if (next !== method) { player.reset(); setMethod(next) } }} step={player.current} />
+      <BstCanvas key={canvasVersion} method={method} onMethodChange={next => { if (next !== method) { reset(); setMethod(next) } }} step={player.current} />
       <CodePanel language={language} onLanguageChange={onLanguageChange} activeLineId={player.current?.line ?? null} condition={player.current?.condition ?? null} lesson={{ lines: getBstCode(method, language), label: method === 'recursive' ? '递归查找' : '非递归查找' }} />
     </div>
-    <PlaybackControls player={player} status={player.current ? `${player.index + 1} / ${player.total} 步 · ${player.current.description}` : '等待查找'} />
+    <PlaybackControls player={{ ...player, reset }} activity="查找" allowEmptyReset />
   </main>
 }

@@ -25,10 +25,38 @@ it('restores every visual/code/result snapshot, keeps language steps, and resets
     act(() => root.render(<App />))
     expect(page().hidden).toBe(false)
     expect(page().querySelectorAll('.bst-null')).toHaveLength(7)
+    // A tree can be rearranged before a search; reset must already be available.
+    const originalCanvas = snapshot().svg
+    const surface = page().querySelector<HTMLElement>('.canvas-surface')!
+    const svg = surface.querySelector('svg')!
+    Object.defineProperty(svg, 'getScreenCTM', { value: () => ({ inverse: () => ({}) }) })
+    surface.setPointerCapture = vi.fn()
+    vi.stubGlobal('DOMPoint', class {
+      x: number; y: number
+      constructor(x: number, y: number) { this.x = x; this.y = y }
+      matrixTransform() { return this }
+    })
+    for (const id of ['14', '18-L']) {
+      const node = surface.querySelector(`[data-bst-node="${id}"]`)!
+      for (const [type, target, x] of [['pointerdown', node, 0], ['pointermove', surface, 60], ['pointerup', surface, 60]] as const) {
+        act(() => {
+          const event = new MouseEvent(type, { bubbles: true, button: 0, clientX: x })
+          Object.defineProperty(event, 'pointerId', { value: 1 }); target.dispatchEvent(event)
+        })
+      }
+    }
+    expect(snapshot().svg).not.toBe(originalCanvas)
+    expect(page().querySelector<HTMLButtonElement>('[aria-label="重置"]')!.disabled).toBe(false)
+    click('重置')
+    expect(snapshot().svg).toBe(originalCanvas)
+    expect(snapshot().status).toBe('等待查找')
     for (const method of ['递归', '非递归']) {
       click(method)
       const initial = snapshot()
-      click('开始查找'); click('暂停')
+      click('开始查找')
+      expect(snapshot().status).toMatch(/^1 \/ \d+ 步 · 播放中$/)
+      click('暂停')
+      expect(snapshot().status).toMatch(/^1 \/ \d+ 步 · 已暂停$/)
       expect(page().querySelector('input')!.readOnly).toBe(true)
       const snapshots = [snapshot()]
       for (let n = 0; n < 100 && !page().querySelector<HTMLButtonElement>('[aria-label="下一步"]')!.disabled; n++) {
@@ -37,6 +65,7 @@ it('restores every visual/code/result snapshot, keeps language steps, and resets
         click('C'); expect(snapshot()).toEqual(snapshots.at(-1))
       }
       expect(snapshot().result).toBe('返回值：节点11')
+      expect(snapshot().status).toMatch(/步 · 查找完成$/)
       for (let n = snapshots.length - 2; n >= 0; n--) { click('上一步'); expect(snapshot()).toEqual(snapshots[n]) }
       click('重置'); expect(snapshot()).toEqual(initial)
       expect(page().querySelector('input')!.readOnly).toBe(false)
