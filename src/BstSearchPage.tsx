@@ -24,11 +24,14 @@ export default function BstSearchPage({ active, language, onLanguageChange }: {
       <section className="input-panel panel" aria-labelledby="bst-input-title">
         <div className="panel-heading"><h2 id="bst-input-title">输入数据</h2></div>
         <form className="input-controls" onSubmit={event => { event.preventDefault(); if (parsed.ok && !locked) player.start(parsed.value, method) }}>
-          <div className="input-row"><div className="bst-input-lines">
+          <div className="input-row">
             <input aria-label="整数查找值" aria-describedby="bst-input-feedback" aria-invalid={!parsed.ok} inputMode="text" maxLength={64} value={input} readOnly={locked} onChange={event => { if (!locked) { setInput(event.target.value); player.reset() } }} />
-            <output aria-label="返回值" aria-live="polite">返回值：{resultText}</output>
-          </div><button className="primary-button" type="submit" disabled={!parsed.ok || locked}>开始查找</button></div>
-          <p id="bst-input-feedback" className={`field-hint ${parsed.ok ? '' : 'field-error'}`} aria-live="polite">{!parsed.ok ? parsed.error : locked ? '本次查找值已锁定，重置后可修改' : ''}</p>
+            <button className="primary-button" type="submit" disabled={!parsed.ok || locked}>开始查找</button>
+          </div>
+          <div className="bst-input-feedback">
+            <output className="field-hint" aria-label="返回值" aria-live="polite">返回值：{resultText}</output>
+            <p id="bst-input-feedback" className={`field-hint ${parsed.ok ? '' : 'field-error'}`} aria-live="polite">{!parsed.ok ? parsed.error : ''}</p>
+          </div>
         </form>
       </section>
       <BstCanvas method={method} onMethodChange={next => { if (next !== method) { player.reset(); setMethod(next) } }} step={player.current} />

@@ -9,7 +9,11 @@
 .bst-motion-arrow.return { stroke: var(--bst-purple); }
 .bst-arrow-head.down { fill: var(--bst-amber); }
 .bst-arrow-head.return { fill: var(--bst-purple); }
-.bst-input-lines { flex: 1; min-width: 0; border: 1px solid var(--appearance-border); border-radius: 4px; background: var(--appearance-field); }
-.bst-input-lines input { min-height: 30px; border: 0; background: transparent; font: 14px/1.5 Consolas, monospace; }
-.bst-input-lines output { display: block; padding: 3px 12px 7px; font-size: 13px; }
+.bst-page .input-controls { grid-template-rows: 11px auto auto; }
+.bst-page .input-row { flex-direction: row; align-items: stretch; }
+.bst-page .input-row input { flex: 1; height: 36px; min-height: 36px; font: 14px/1.5 Consolas, monospace; }
+.bst-page .input-row .primary-button { height: 36px; min-height: 36px; }
+.bst-input-feedback { grid-row: 3; }
+.bst-input-feedback output { display: block; padding-left: 8px; font-size: 13px; line-height: 1.6; }
+.bst-input-feedback p:empty { display: none; }
 .bst-page input:focus-visible { outline: 2px solid var(--appearance-focus); }
