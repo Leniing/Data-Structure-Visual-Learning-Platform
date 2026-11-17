@@ -30,9 +30,10 @@ export default function BstSearchPage({ active, language, onLanguageChange }: {
             <input aria-label="整数查找值" aria-describedby="bst-input-feedback" aria-invalid={!parsed.ok} inputMode="text" maxLength={64} value={input} readOnly={locked} onChange={event => { if (!locked) { setInput(event.target.value); player.reset() } }} />
             <button className="primary-button" type="submit" disabled={!parsed.ok || locked}>开始查找</button>
           </div>
-          <div className="bst-input-feedback">
-            <output className="field-hint" aria-label="返回值" aria-live="polite">返回值：{resultText}</output>
-            <p id="bst-input-feedback" className={`field-hint ${parsed.ok ? '' : 'field-error'}`} aria-live="polite">{!parsed.ok ? parsed.error : ''}</p>
+          <div id="bst-input-feedback" className="bst-input-feedback" aria-live="polite">
+            {!parsed.ok
+              ? <p className="field-hint field-error">{parsed.error}</p>
+              : player.total > 0 && <output className="field-hint" aria-label="返回值">返回值：{resultText}</output>}
           </div>
         </form>
       </section>

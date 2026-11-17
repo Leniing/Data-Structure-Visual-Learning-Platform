@@ -18,12 +18,13 @@ it('restores every visual/code/result snapshot, keeps language steps, and resets
   const snapshot = () => ({
     svg: page().querySelector('svg[aria-label="预设二叉搜索树"]')!.innerHTML,
     code: page().querySelector('[aria-current="step"]')?.getAttribute('data-line-id'),
-    result: page().querySelector('output[aria-label="返回值"]')!.textContent,
+    result: page().querySelector('output[aria-label="返回值"]')?.textContent ?? null,
     status: page().querySelector('.playback-panel .muted')!.textContent,
   })
   try {
     act(() => root.render(<App />))
     expect(page().hidden).toBe(false)
+    expect(snapshot().result).toBeNull()
     expect(page().querySelectorAll('.bst-null')).toHaveLength(7)
     // A tree can be rearranged before a search; reset must already be available.
     const originalCanvas = snapshot().svg
@@ -54,6 +55,7 @@ it('restores every visual/code/result snapshot, keeps language steps, and resets
       click(method)
       const initial = snapshot()
       click('开始查找')
+      expect(snapshot().result).toBe('返回值：—')
       expect(snapshot().status).toMatch(/^1 \/ \d+ 步 · 播放中$/)
       click('暂停')
       expect(snapshot().status).toMatch(/^1 \/ \d+ 步 · 已暂停$/)
@@ -72,7 +74,7 @@ it('restores every visual/code/result snapshot, keeps language steps, and resets
       expect(page().querySelector('input')!.readOnly).toBe(false)
     }
     click('开始查找'); click('递归')
-    expect(snapshot().result).toBe('返回值：—')
+    expect(snapshot().result).toBeNull()
     expect(page().querySelector('[aria-current="step"]')).toBeNull()
     click('开始查找')
     const before = snapshot()
