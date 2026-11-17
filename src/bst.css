@@ -1,4 +1,5 @@
-.bst-page { --bst-amber: light-dark(#ad700d, #edb95e); --bst-purple: light-dark(#8055b5, #bd9ae8); }
+/* Preserve the lesson's semantic state colors; previews reuse these unchanged. */
+:is(.bst-page, .algorithm-preview) { --bst-amber: light-dark(#ad700d, #edb95e); --bst-purple: light-dark(#8055b5, #bd9ae8); }
 .bst-node.current { fill: light-dark(#efbe61, #916516); }
 .bst-node.visited { fill: light-dark(#f5e2b9, #59482d); }
 .bst-node.found { fill: light-dark(#b8ddc2, #345e44); }

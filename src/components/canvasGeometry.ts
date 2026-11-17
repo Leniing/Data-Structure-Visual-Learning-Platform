@@ -19,12 +19,12 @@ export function dataBoundary(source: Point, node: Point): Point {
   return boundary(source, { x: node.x + DATA_CENTER_OFFSET, y: node.y }, DATA_HALF_WIDTH, 24)
 }
 
-export function moduleBoundary(source: Point, node: Point): Point {
-  return boundary(source, node, MODULE_HALF_WIDTH, MODULE_HALF_HEIGHT)
+export function moduleBoundary(source: Point, node: Point, halfHeight = MODULE_HALF_HEIGHT): Point {
+  return boundary(source, node, MODULE_HALF_WIDTH, halfHeight)
 }
 
-export function connectionArrowPath(source: Point, target: Point, targetIsModule = false): string {
-  const end = targetIsModule ? moduleBoundary(source, target) : dataBoundary(source, target)
+export function connectionArrowPath(source: Point, target: Point, targetIsModule = false, moduleHalfHeight = MODULE_HALF_HEIGHT): string {
+  const end = targetIsModule ? moduleBoundary(source, target, moduleHalfHeight) : dataBoundary(source, target)
   const dx = end.x - source.x
   const dy = end.y - source.y
   const length = Math.hypot(dx, dy)

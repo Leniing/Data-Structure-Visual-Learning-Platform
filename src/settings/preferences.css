@@ -73,7 +73,8 @@
   --learning-border: var(--appearance-border);
 }
 
-:root[data-palette='multicolor'] .experiment-page {
+/* Overview diagrams use the same canvas palette as the learning pages. */
+:root[data-palette='multicolor'] :is(.experiment-page, .algorithm-diagram) {
   --appearance-secondary: var(--appearance-muted);
   --appearance-accent: light-dark(#414c61, #c3ccdf);
   --appearance-accent-text: light-dark(#fff, #222a38);

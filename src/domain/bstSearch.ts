@@ -1,4 +1,4 @@
-import { bstTree } from './bstTree'
+import { bstTree, type BstNode } from './bstTree'
 import type { BstLine, BstMethod } from '../teaching/bstCode'
 
 export interface BstVisualState {
@@ -25,11 +25,11 @@ export function parseSearchValue(input: string): { ok: true; value: number } | {
   return { ok: true, value }
 }
 
-export function createBstSearchSteps(target: number, method: BstMethod): readonly BstStep[] {
+export function createBstSearchSteps(target: number, method: BstMethod, tree: readonly BstNode[] = bstTree): readonly BstStep[] {
   if (!parseSearchValue(String(target)).ok) throw new RangeError('查找值必须为 32 位有符号整数')
   const steps: BstStep[] = []
   const visited: string[] = [], traversed: string[] = []
-  let current: string | null = '14', found: string | null = null, failed: string | null = null
+  let current: string | null = tree[0]?.id ?? null, found: string | null = null, failed: string | null = null
   const emit = (line: BstLine, phase: BstStep['phase'], description: string, condition: boolean | null = null, arrow: BstVisualState['arrow'] = null, result: BstStep['result'] = null) => {
     steps.push(Object.freeze({ current, found, failed, visited: Object.freeze([...visited]), traversed: Object.freeze([...traversed]),
       line, phase, description, condition, arrow: arrow ? Object.freeze({ ...arrow }) : null, result }))
@@ -37,8 +37,8 @@ export function createBstSearchSteps(target: number, method: BstMethod): readonl
   const frames: { parent: string; child: string; line: 'left' | 'right' }[] = []
   emit('enter', 'enter', `开始查找 ${target}`)
   // Each descent visits a distinct node of the fixed finite tree.
-  for (let depth = 0; depth <= bstTree.length; depth++) {
-    const node = bstTree.find(item => item.id === current)
+  for (let depth = 0; depth <= tree.length; depth++) {
+    const node = tree.find(item => item.id === current)
     if (node && !visited.includes(node.id)) visited.push(node.id)
     if (!node && method === 'iterative') failed = current
     emit('null-check', 'check', node ? `判空：节点 ${node.value} 非空` : '判空：到达 NULL', method === 'recursive' ? !node : Boolean(node))

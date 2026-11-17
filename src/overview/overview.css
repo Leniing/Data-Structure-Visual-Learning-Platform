@@ -18,10 +18,10 @@
 .algorithm-card h2 { font-size: 18px; line-height: 1.5; margin-bottom: 8px; }
 .algorithm-description { color: var(--appearance-muted); font-size: 13px; line-height: 1.8; min-height: 47px; margin-bottom: 16px; }
 .algorithm-diagram { width: 100%; height: 146px; margin-top: auto; margin-bottom: 18px; border-radius: 10px; background: var(--appearance-canvas); }
-.algorithm-diagram path, .algorithm-diagram ellipse { stroke: var(--appearance-stroke); stroke-width: 2; fill: none; }
-.diagram-node { fill: var(--appearance-field); stroke: var(--appearance-stroke); }
+.algorithm-diagram:not(.algorithm-preview) path, .algorithm-diagram:not(.algorithm-preview) ellipse { stroke: var(--appearance-secondary); stroke-width: 2; fill: none; }
+.diagram-node { fill: var(--appearance-surface); stroke: var(--appearance-stroke); }
 .diagram-active { fill: var(--appearance-pointer); stroke: var(--appearance-accent); }
-.algorithm-diagram text { fill: var(--appearance-ink); text-anchor: middle; font-size: 13px; font-family: var(--interface-font); }
+.algorithm-diagram:not(.algorithm-preview) text { fill: var(--appearance-text); text-anchor: middle; font-size: 13px; font-family: var(--interface-font); }
 .algorithm-open, .algorithm-unavailable { padding-top: 14px; border-top: 1px solid var(--appearance-border); font-size: 12px; }
 .algorithm-open { color: var(--appearance-accent); text-decoration: none; font-weight: 600; display: flex; justify-content: space-between; }
 .algorithm-open::after { content: ''; position: absolute; inset: 0; border-radius: 16px; }
@@ -35,3 +35,7 @@
 @media (hover: hover) { .algorithm-card:hover { transform: translateY(-4px) scale(1.012); box-shadow: 0 12px 28px color-mix(in srgb, var(--appearance-ink) 14%, transparent); z-index: 1; } }
 @media (max-width: 720px) { .overview-header { padding: 20px 20px 0; } .overview-title-row { flex-direction: column; align-items: stretch; gap: 16px; } .overview-search { width: 100%; } .overview-grid { padding: 20px; gap: 16px; } .overview-filters { margin-top: 16px; padding-bottom: 16px; gap: 6px; } .overview-filters button { padding: 7px 12px; } .overview-page h1 { font-size: 25px; } }
 @media (prefers-reduced-motion: reduce) { .algorithm-card { transition: none; } .algorithm-card:hover { transform: none; } }
+
+/* Node, edge, text and state colors come from the shared canvas styles. */
+.algorithm-preview { border: 1px solid var(--appearance-border); }
+.algorithm-preview text { font-size: 16px; }

@@ -1,3 +1,4 @@
+export interface BstNode { readonly id: string; readonly value: number; readonly left: string; readonly right: string; readonly x: number; readonly y: number }
 // Fixed topology. NULL positions belong to edges, not real tree nodes.
 export const bstTree = Object.freeze([
   { id: '14', value: 14, left: '7', right: '18', x: 360, y: 70 },
