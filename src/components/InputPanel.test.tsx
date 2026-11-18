@@ -1,6 +1,6 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { expect, it } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import InputPanel from './InputPanel'
 
 it('hides valid feedback and explains rejected multiline paste without changing input', () => {
@@ -28,21 +28,34 @@ it('hides valid feedback and explains rejected multiline paste without changing 
   }
 })
 
-it('blocks a third line but allows replacing the existing newline', () => {
+it('creates from the second line only for valid input and allows replacing the newline', () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
   const host = document.createElement('div')
   const root = createRoot(host)
+  const onCreate = vi.fn()
   try {
-    act(() => root.render(<InputPanel supported activeInput={null} inputIndex={null} onCreate={() => {}} onInputChange={() => {}} />))
+    act(() => root.render(<InputPanel supported activeInput={null} inputIndex={null} onCreate={onCreate} onInputChange={() => {}} />))
     const input = host.querySelector('textarea')!
     input.setSelectionRange(input.value.length, input.value.length)
     const blocked = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
     act(() => input.dispatchEvent(blocked))
     expect(blocked.defaultPrevented).toBe(true)
+    expect(onCreate).toHaveBeenCalledWith([3, 1, 4, 1, 5])
+    onCreate.mockClear()
+    act(() => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true })))
+    expect(onCreate).not.toHaveBeenCalled()
     input.setSelectionRange(1, 2)
     const replacement = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
     act(() => input.dispatchEvent(replacement))
     expect(replacement.defaultPrevented).toBe(false)
+    expect(onCreate).not.toHaveBeenCalled()
+    act(() => {
+      Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(input, '2\n1')
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+    input.setSelectionRange(input.value.length, input.value.length)
+    act(() => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })))
+    expect(onCreate).not.toHaveBeenCalled()
   } finally {
     act(() => root.unmount())
   }

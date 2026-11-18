@@ -4,6 +4,52 @@ import { expect, it, vi } from 'vitest'
 import App from './App'
 import BstSearchPage from './BstSearchPage'
 
+it('rejects oversized edits and paste, and allows editing and restarting during playback or pause', () => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+  vi.useFakeTimers()
+  const host = document.createElement('div'), root = createRoot(host)
+  document.body.append(host)
+  try {
+    act(() => root.render(<BstSearchPage active language="c" onLanguageChange={() => {}} />))
+    const input = host.querySelector('input')!
+    const button = host.querySelector<HTMLButtonElement>('.primary-button')!
+    const status = () => host.querySelector('.playback-panel .muted')!.textContent
+    const type = (value: string) => act(() => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, value)
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+    type('1'.repeat(65))
+    expect(input.value).toBe('11')
+    expect(host.querySelector('#bst-input-feedback')!.textContent).toBe('输入不能超过 64 个字符')
+    input.setSelectionRange(0, input.value.length)
+    const paste = new Event('paste', { bubbles: true, cancelable: true })
+    Object.defineProperty(paste, 'clipboardData', { value: { getData: () => '2'.repeat(65) } })
+    act(() => input.dispatchEvent(paste))
+    expect(paste.defaultPrevented).toBe(true)
+    expect(input.value).toBe('11')
+    act(() => button.click())
+    expect(status()).toMatch(/^1 \/ .*播放中$/)
+    expect(button.disabled).toBe(false)
+    expect(input.readOnly).toBe(false)
+    act(() => vi.advanceTimersByTime(850))
+    act(() => button.click())
+    expect(status()).toMatch(/^1 \/ .*播放中$/)
+    type('14')
+    expect(status()).toBe('等待查找')
+    act(() => vi.advanceTimersByTime(1700))
+    expect(status()).toBe('等待查找')
+    act(() => button.click())
+    act(() => host.querySelector<HTMLButtonElement>('[aria-label="暂停"]')!.click())
+    type('18')
+    expect(input.value).toBe('18')
+    expect(status()).toBe('等待查找')
+    act(() => button.click())
+    expect(status()).toMatch(/^1 \/ .*播放中$/)
+  } finally {
+    act(() => root.unmount()); host.remove(); vi.useRealTimers()
+  }
+})
+
 it('defers incomplete input feedback and prevents submission during composition', () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
   const host = document.createElement('div'), root = createRoot(host)
@@ -118,7 +164,7 @@ it('restores every visual/code/result snapshot, keeps language steps, and resets
       expect(snapshot().status).toMatch(/^1 \/ \d+ 步 · 播放中$/)
       click('暂停')
       expect(snapshot().status).toMatch(/^1 \/ \d+ 步 · 已暂停$/)
-      expect(page().querySelector('input')!.readOnly).toBe(true)
+      expect(page().querySelector('input')!.readOnly).toBe(false)
       const snapshots = [snapshot()]
       for (let n = 0; n < 100 && !page().querySelector<HTMLButtonElement>('[aria-label="下一步"]')!.disabled; n++) {
         click('下一步'); snapshots.push(snapshot())

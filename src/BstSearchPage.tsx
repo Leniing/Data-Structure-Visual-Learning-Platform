@@ -15,32 +15,41 @@ export default function BstSearchPage({ active, language, onLanguageChange }: {
   const [input, setInput] = useState('11')
   const [focused, setFocused] = useState(false)
   const [composing, setComposing] = useState(false)
+  const [notice, setNotice] = useState('')
   const player = useBstPlayer(active)
   const [canvasVersion, setCanvasVersion] = useState(0)
   const reset = () => { player.reset(); setCanvasVersion(version => version + 1) }
   const parsed = parseSearchValue(input)
   const empty = !input.trim()
   const editingSign = focused && /^[+-]$/.test(input.trim())
-  const message = composing || editingSign ? '' : empty ? focused ? '请输入查找值' : '' : parsed.ok ? '' : parsed.error
+  const message = notice || (composing || editingSign ? '' : empty ? focused ? '请输入查找值' : '' : parsed.ok ? '' : parsed.error)
   const isError = Boolean(message) && !empty
   const result = player.current?.result
   const resultText = result == null ? '—' : result === 'NULL' ? 'NULL' : `节点${result}`
-  const locked = player.total > 0 && !player.atEnd
   return <main className="experiment-page bst-page" hidden={!active}>
     <header className="page-header"><div><h1>二叉搜索树查找</h1><p className="page-description">比较节点值，逐步缩小查找范围</p></div></header>
     <div className="workspace">
       <section className="input-panel panel" aria-labelledby="bst-input-title">
         <div className="panel-heading"><h2 id="bst-input-title">输入数据</h2></div>
-        <form className="input-controls" onSubmit={event => { event.preventDefault(); if (parsed.ok && !locked && !composing) player.start(parsed.value, method) }}>
+        <form className="input-controls" onSubmit={event => { event.preventDefault(); if (parsed.ok && !composing) { setNotice(''); player.start(parsed.value, method) } }}>
           <div className="input-row">
-            <input aria-label="整数查找值" aria-describedby="bst-input-feedback" aria-invalid={isError} inputMode="text" maxLength={64} value={input} readOnly={locked}
+            <input aria-label="整数查找值" aria-describedby="bst-input-feedback" aria-invalid={isError} inputMode="text" value={input}
               onFocus={() => setFocused(true)}
               onBlur={() => { setFocused(false); setComposing(false) }}
               onCompositionStart={() => setComposing(true)}
               onCompositionEnd={() => setComposing(false)}
               onKeyDown={event => { if (event.key === 'Enter' && (composing || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229)) event.preventDefault() }}
-              onChange={event => { if (!locked) { setInput(event.target.value); player.reset() } }} />
-            <button className="primary-button" type="submit" disabled={!parsed.ok || locked || composing}>开始查找</button>
+              onPaste={event => {
+                const target = event.currentTarget
+                const pasted = event.clipboardData.getData('text').replace(/[\r\n]/g, '')
+                const next = target.value.slice(0, target.selectionStart ?? 0) + pasted + target.value.slice(target.selectionEnd ?? 0)
+                if (next.length > 64) { event.preventDefault(); setNotice('输入不能超过 64 个字符') }
+              }}
+              onChange={event => {
+                if (event.target.value.length > 64) { setNotice('输入不能超过 64 个字符'); return }
+                setNotice(''); setInput(event.target.value); player.reset()
+              }} />
+            <button className="primary-button" type="submit" disabled={!parsed.ok || composing}>开始查找</button>
           </div>
           <div id="bst-input-feedback" className="input-feedback bst-input-feedback" aria-live="polite">
             {message

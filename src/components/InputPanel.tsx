@@ -83,7 +83,13 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
               }}
               onKeyDown={(event) => {
                 if (event.key !== 'Enter') return
+                if (composing || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return
                 const { value, selectionStart, selectionEnd } = event.currentTarget
+                if (value.slice(0, selectionStart).includes('\n')) {
+                  event.preventDefault()
+                  if (result.ok && supported) { setNotice(''); onCreate(result.values) }
+                  return
+                }
                 const remaining = value.slice(0, selectionStart) + value.slice(selectionEnd)
                 if (remaining.includes('\n')) event.preventDefault()
               }}
@@ -98,7 +104,7 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
               }}
             />
           </div>
-          <button type="button" className="primary-button" disabled={!result.ok || !supported} onClick={() => { if (result.ok && supported) onCreate(result.values) }}>创建链表</button>
+          <button type="button" className="primary-button" disabled={!result.ok || !supported || composing} onClick={() => { if (result.ok && supported && !composing) { setNotice(''); onCreate(result.values) } }}>创建链表</button>
         </div>
         <div id="input-feedback" className="input-feedback" aria-live="polite">
           <p className={`field-hint ${isError ? 'field-error' : ''}`}>{message}</p>
