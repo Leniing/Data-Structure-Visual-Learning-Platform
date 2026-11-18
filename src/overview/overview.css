@@ -11,10 +11,22 @@
 .overview-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--appearance-border); }
 .overview-filters button, .overview-empty button { padding: 8px 18px; border: 1px solid var(--appearance-border); border-radius: 8px; background: var(--appearance-surface); color: var(--appearance-muted); cursor: pointer; font-size: 13px; }
 .overview-filters button[aria-pressed='true'] { background: var(--appearance-accent); border-color: var(--appearance-accent); color: var(--appearance-accent-text); }
+.overview-filters button { transition: background-color 150ms ease; }
+.overview-filters button[aria-pressed='false']:focus-visible { background: color-mix(in srgb, var(--appearance-accent) 12%, var(--appearance-surface)); }
+@media (hover: hover) {
+  .overview-filters button[aria-pressed='false']:hover { background: color-mix(in srgb, var(--appearance-accent) 12%, var(--appearance-surface)); }
+}
 .overview-scroll { overflow-y: auto; min-height: 0; flex: 1; scrollbar-gutter: stable; }
 .overview-grid { width: min(1320px, 100%); margin: 0 auto; padding: 24px 36px 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 22px; }
 .algorithm-card { position: relative; min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--appearance-border); border-radius: 16px; padding: 22px; background: var(--appearance-surface); transition: transform 180ms ease, box-shadow 180ms ease; }
 .algorithm-category { align-self: flex-start; background: var(--appearance-subtle); color: var(--appearance-secondary); border-radius: 5px; padding: 4px 9px; font-size: 11px; margin-bottom: 16px; }
+.algorithm-category[data-category='链表'] { color: #3977D5; }
+.algorithm-category[data-category='栈'] { color: #8956C7; }
+.algorithm-category[data-category='队列'] { color: #1397A1; }
+.algorithm-category[data-category='树'] { color: #389665; }
+.algorithm-category[data-category='查找'] { color: #D88A25; }
+.algorithm-category[data-category='图'] { color: #C95783; }
+.algorithm-category[data-category='排序'] { color: #6265CD; }
 .algorithm-card h2 { font-size: 18px; line-height: 1.5; margin-bottom: 8px; }
 .algorithm-description { color: var(--appearance-muted); font-size: 13px; line-height: 1.8; min-height: 47px; margin-bottom: 16px; }
 .algorithm-diagram { width: 100%; height: 146px; margin-top: auto; margin-bottom: 18px; border-radius: 10px; background: var(--appearance-canvas); }
@@ -34,7 +46,7 @@
 }
 @media (hover: hover) { .algorithm-card:hover { transform: translateY(-4px) scale(1.012); box-shadow: 0 12px 28px color-mix(in srgb, var(--appearance-ink) 14%, transparent); z-index: 1; } }
 @media (max-width: 720px) { .overview-header { padding: 20px 20px 0; } .overview-title-row { flex-direction: column; align-items: stretch; gap: 16px; } .overview-search { width: 100%; } .overview-grid { padding: 20px; gap: 16px; } .overview-filters { margin-top: 16px; padding-bottom: 16px; gap: 6px; } .overview-filters button { padding: 7px 12px; } .overview-page h1 { font-size: 25px; } }
-@media (prefers-reduced-motion: reduce) { .algorithm-card { transition: none; } .algorithm-card:hover { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .algorithm-card, .overview-filters button { transition: none; } .algorithm-card:hover { transform: none; } }
 
 /* Node, edge, text and state colors come from the shared canvas styles. */
 .algorithm-preview { border: 1px solid var(--appearance-border); }

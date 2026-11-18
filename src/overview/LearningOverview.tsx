@@ -43,7 +43,7 @@ function AlgorithmCard({ item, active, onNavigate }: { item: Algorithm; active: 
   const supported = tree || item.route === '#linked-list-creation'
   const player = usePreviewPlayer(tree ? treePreviewSteps.length : listPreviewSteps.length, active && supported)
   return <article className="algorithm-card" {...player.events}>
-        <span className="algorithm-category">{item.category}</span>
+        <span className="algorithm-category" data-category={item.category}>{item.category}</span>
         <h2>{item.name}</h2><p className="algorithm-description">{item.description}</p>
         {supported ? <PreviewDiagram tree={tree} index={player.index} /> : <AlgorithmDiagram algorithm={item} />}
         {item.route ? <a className="algorithm-open" href={item.route} onClick={event => {
