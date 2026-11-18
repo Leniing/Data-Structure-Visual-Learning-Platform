@@ -1,10 +1,11 @@
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, expect, it, vi } from 'vitest'
 import { AiWindow } from './AiWindow'
 import { aiClient } from './aiClient'
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+beforeEach(() => { aiClient.configured = false })
 afterEach(() => { vi.restoreAllMocks(); aiClient.configured = false })
 
 const context = { chapterId: 'list', chapterTitle: '单链表创建' }

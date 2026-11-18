@@ -23,7 +23,7 @@
 .ai-window-messages { flex: 1; min-height: 0; overflow: auto; padding: 12px; overscroll-behavior: contain; }
 .ai-window-message { margin-bottom: 12px; padding: 8px; border-radius: 8px; background: var(--learning-hover, #f1f5f9); }
 .ai-window-message-user { background: var(--learning-hover, #eff6ff); }
-.ai-window-message > div { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ai-window-message > div { overflow-wrap: anywhere; }
 .ai-window-message pre { max-width: 100%; overflow: auto; padding: 8px; border-radius: 4px; background: #172033; color: #f8fafc; white-space: pre; }
 .ai-window-status { flex-shrink: 0; padding: 0 12px; overflow-wrap: anywhere; max-height: 60px; overflow: auto; color: var(--learning-ink, #475569); }
 .ai-window-retry { align-self: flex-start; margin: 4px 12px; }
@@ -39,3 +39,22 @@
 .ai-window textarea::placeholder { color: var(--learning-ink, #475569); opacity: .55; }
 .ai-window textarea:focus::placeholder { color: transparent; }
 .ai-window-status:empty { display: none; }
+
+.ai-markdown { line-height: 1.7; }
+.ai-markdown > :first-child { margin-top: 4px; }
+.ai-markdown > :last-child { margin-bottom: 0; }
+.ai-markdown p { margin: 8px 0; white-space: pre-wrap; }
+.ai-markdown :is(h1, h2, h3, h4, h5, h6) { margin: 14px 0 6px; line-height: 1.4; font-size: 1.05em; }
+.ai-markdown h1 { font-size: 1.25em; }
+.ai-markdown h2 { font-size: 1.15em; }
+.ai-markdown :is(ul, ol) { margin: 8px 0; padding-left: 24px; }
+.ai-markdown li + li { margin-top: 4px; }
+.ai-markdown li > p { margin: 4px 0; }
+.ai-markdown blockquote { margin: 8px 0; padding: 2px 10px; border-left: 3px solid var(--learning-border, #cbd5e1); }
+.ai-markdown :not(pre) > code { padding: 2px 4px; border-radius: 4px; background: var(--learning-surface, #fff); font-size: .9em; }
+.ai-markdown a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.ai-markdown-table { max-width: 100%; overflow-x: auto; margin: 8px 0; }
+.ai-markdown table { border-collapse: collapse; width: 100%; }
+.ai-markdown :is(th, td) { padding: 6px 8px; border: 1px solid var(--learning-border, #cbd5e1); text-align: left; }
+.ai-markdown th { background: var(--learning-surface, #fff); }
+.ai-markdown hr { border: 0; border-top: 1px solid var(--learning-border, #cbd5e1); margin: 12px 0; }

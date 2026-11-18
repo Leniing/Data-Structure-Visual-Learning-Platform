@@ -4,6 +4,7 @@ import { aiClient } from './aiClient'
 import type { AiContext, AiMessage } from './aiClient'
 import { clampRect, initialRect, maximizedRect } from './geometry'
 import type { WindowRect } from './geometry'
+import MessageContent from './MessageContent'
 import './AiWindow.css'
 
 export interface AiWindowProps {
@@ -17,17 +18,6 @@ const MAX_DRAFT = 4000
 const MAX_MESSAGES = 100
 const MAX_RESPONSE = 100000
 const viewport = () => ({ width: window.innerWidth, height: window.innerHeight })
-
-function MessageContent({ text }: { text: string }) {
-  const parts = text.split(/(```[^\n]*\n[\s\S]*?```)/g)
-  return parts.map((part, index) => {
-    if (!part.startsWith('```') || !part.endsWith('```')) {
-      return <span key={index}>{part}</span>
-    }
-    const newline = part.indexOf('\n')
-    return <pre key={index}><code>{part.slice(newline + 1, -3)}</code></pre>
-  })
-}
 
 export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowProps) {
   const [rect, setRect] = useState(() => initialRect(viewport(), initialLeft))
@@ -170,7 +160,7 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
       }}>
         {messages.map((message) => <article className={`ai-window-message ai-window-message-${message.role}`} key={message.id}>
           <strong>{message.role === 'user' ? '你' : 'AI'}</strong>
-          <div><MessageContent text={message.content} /></div>
+          <div className="ai-markdown"><MessageContent text={message.content} /></div>
         </article>)}
       </div>
       <div className="ai-window-status" role="status">

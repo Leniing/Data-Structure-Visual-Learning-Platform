@@ -25,7 +25,7 @@ export interface AiClient {
  * 请求：{ messages: [{ role, content }], context: { chapterId, chapterTitle, language } }
  * 响应：{ content: 'AI 回复正文' }。第三方 API 密钥应由后端保存。
  */
-export const AI_API_ENDPOINT: string = ''
+export const AI_API_ENDPOINT: string = '/api/chat'
 
 export const aiClient: AiClient = {
   configured: Boolean(AI_API_ENDPOINT),
@@ -37,7 +37,12 @@ export const aiClient: AiClient = {
       body: JSON.stringify({ messages: messages.map(({ role, content }) => ({ role, content })), context }),
       signal,
     })
-    if (!response.ok) throw new Error(`发送失败（HTTP ${response.status}），请重试`)
+    if (!response.ok) {
+      const failure: unknown = await response.json().catch(() => null)
+      const message = failure && typeof failure === 'object' && 'error' in failure && typeof failure.error === 'string'
+        ? failure.error.slice(0, 300) : `发送失败（HTTP ${response.status}），请确认 AI 后端已启动`
+      throw new Error(message)
+    }
     const data: unknown = await response.json()
     if (!data || typeof data !== 'object' || !('content' in data) || typeof data.content !== 'string') {
       throw new Error('AI 接口响应格式不正确：需要 { content: "回复正文" }')
