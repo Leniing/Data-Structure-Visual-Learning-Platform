@@ -61,7 +61,7 @@ export default function BstCanvas({ method, onMethodChange, step }: {
         </g>
       </svg>
       <div className="canvas-zoom" role="group" aria-label="画布缩放" onPointerDown={event => event.stopPropagation()}>
-        <button type="button" aria-label="缩小" disabled={zoom <= .6} onClick={() => changeZoom(-.1)}>−</button><output aria-label="缩放比例">{Math.round(zoom * 100)}%</output><button type="button" aria-label="放大" disabled={zoom >= 1.8} onClick={() => changeZoom(.1)}>+</button>
+        <button type="button" aria-label="缩小" title="缩小" disabled={zoom <= .6} onClick={() => changeZoom(-.1)}>−</button><output aria-label="缩放比例">{Math.round(zoom * 100)}%</output><button type="button" aria-label="放大" title="放大" disabled={zoom >= 1.8} onClick={() => changeZoom(.1)}>+</button>
       </div>
     </div>
   </section>
