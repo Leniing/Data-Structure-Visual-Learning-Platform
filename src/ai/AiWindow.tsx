@@ -31,8 +31,6 @@ function MessageContent({ text }: { text: string }) {
 
 export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowProps) {
   const [rect, setRect] = useState(() => initialRect(viewport(), initialLeft))
-  const [maximized, setMaximized] = useState(false)
-  const restoreRect = useRef(rect)
   const [draft, setDraft] = useState('')
   const [messages, setMessages] = useState<AiMessage[]>([])
   const [loading, setLoading] = useState(false)
@@ -47,7 +45,6 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
   const composing = useRef(false)
   const gesture = useRef<{ pointerId: number; x: number; y: number; rect: WindowRect; mode: 'move' | 'resize' } | null>(null)
   const headingId = useId()
-  const reasonId = useId()
 
   useLayoutEffect(() => {
     latestContext.current = contextKey
@@ -131,7 +128,7 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
   }
 
   function begin(event: ReactPointerEvent<HTMLElement>, mode: 'move' | 'resize') {
-    if (maximized || event.button !== 0 || event.target !== event.currentTarget) return
+    if (event.button !== 0 || event.target !== event.currentTarget) return
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
     gesture.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, rect, mode }
@@ -154,42 +151,34 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
   }
 
-  function toggleMaximize() {
-    gesture.current = null
-    if (maximized) setRect(clampRect(restoreRect.current, viewport()))
-    else restoreRect.current = rect
-    setMaximized(!maximized)
-  }
-
   const disabledReason = !aiClient.configured ? 'AI 服务尚未接入' : messages.length >= MAX_MESSAGES ? '本次对话已达消息上限' : loading ? '正在等待 AI 回复' : !draft.trim() ? '请输入消息' : ''
-  const displayedRect = maximized ? maximizedRect(viewport()) : clampRect(rect, viewport())
+  const displayedRect = clampRect(rect, viewport())
 
   return (
     <section className="ai-window" hidden={!visible} aria-labelledby={headingId} style={displayedRect}>
       <header className="ai-window-titlebar" onPointerDown={(event) => begin(event, 'move')} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={() => { gesture.current = null }}>
         <h2 id={headingId}>AI 解答</h2>
         <div className="ai-window-actions">
-          <button type="button" onClick={toggleMaximize} aria-label={maximized ? '还原 AI 窗口' : '最大化 AI 窗口'}>{maximized ? '还原' : '最大化'}</button>
-          <button type="button" onClick={onClose} aria-label="关闭 AI 窗口">关闭</button>
+          <button className="ai-window-icon" type="button" onClick={onClose} aria-label="关闭 AI 窗口" title="关闭">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
         </div>
       </header>
-      <p className="ai-window-context">当前章节：{context.chapterTitle}</p>
       <div className="ai-window-messages" ref={log} role="log" aria-label="AI 对话记录" aria-live="polite" onScroll={() => {
         const node = log.current
         if (node) nearBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < 64
       }}>
-        {messages.length === 0 && <p>可在此输入与当前章节相关的问题。</p>}
         {messages.map((message) => <article className={`ai-window-message ai-window-message-${message.role}`} key={message.id}>
           <strong>{message.role === 'user' ? '你' : 'AI'}</strong>
           <div><MessageContent text={message.content} /></div>
         </article>)}
       </div>
       <div className="ai-window-status" role="status">
-        {!aiClient.configured ? 'AI 服务尚未接入' : loading ? '正在生成回复…' : error}
+        {loading ? '正在生成回复…' : error}
       </div>
       {aiClient.configured && error && retryMessages && <button className="ai-window-retry" type="button" onClick={() => void send(retryMessages)}>重试发送</button>}
       <form className="ai-window-composer" onSubmit={(event) => { event.preventDefault(); submit() }}>
-        <textarea aria-label="输入 AI 消息" placeholder="输入你对本章知识的疑问…" value={draft} maxLength={MAX_DRAFT}
+        <textarea aria-label="输入 AI 消息" placeholder="请输入你的疑问..." value={draft} maxLength={MAX_DRAFT}
           onChange={(event) => setDraft(event.target.value.slice(0, MAX_DRAFT))}
           onCompositionStart={() => { composing.current = true }} onCompositionEnd={() => { composing.current = false }}
           onKeyDown={(event) => {
@@ -199,12 +188,13 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
             }
           }} />
         <div className="ai-window-send-row">
-          <small id={reasonId}>{disabledReason || `${draft.length}/${MAX_DRAFT}`}</small>
           {loading && <button type="button" onClick={stop}>停止生成</button>}
-          <button type="submit" disabled={Boolean(disabledReason)} aria-describedby={reasonId} title={disabledReason || '发送消息'}>发送消息</button>
+          <button className="ai-window-icon ai-window-send" type="submit" disabled={Boolean(disabledReason)} aria-label="发送消息" title={disabledReason || '发送消息'}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-7 18-4-7-7-4 18-7ZM10 14 21 3" /></svg>
+          </button>
         </div>
       </form>
-      <button type="button" className="ai-window-resize" aria-label="调整 AI 窗口大小" disabled={maximized}
+      <button type="button" className="ai-window-resize" aria-label="调整 AI 窗口大小"
         onPointerDown={(event) => begin(event, 'resize')} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={() => { gesture.current = null }}
         onKeyDown={(event) => {
           const delta = event.shiftKey ? 40 : 10

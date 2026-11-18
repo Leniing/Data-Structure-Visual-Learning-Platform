@@ -29,6 +29,7 @@ function App() {
   const [overviewOpen, setOverviewOpen] = useState(() => window.location.hash === '#overview')
   useEffect(() => {
     const sync = () => {
+      setAiWindowVisible(false)
       const hash = window.location.hash
       if (hash !== '#settings') setOverviewOpen(hash === '#overview')
       if (hash !== '#settings' && hash !== '#overview') setLessonRoute(hash === '#bst-search' ? hash : '#linked-list-creation')
@@ -45,7 +46,7 @@ function App() {
 
   return (
     <div className="learning-shell">
-    <LearningNavigation chapter={bstOpen ? chapters.find(chapter => chapter.chapterId === '树')! : linkedListChapter} onOverview={() => navigate('#overview')} overviewOpen={overviewOpen && !settingsOpen} onSettings={openSettings} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={item => { if (item.route) navigate(item.route) }} />
+    <LearningNavigation chapter={bstOpen ? chapters.find(chapter => chapter.chapterId === '树')! : linkedListChapter} onOverview={() => navigate('#overview')} overviewOpen={overviewOpen && !settingsOpen} onSettings={() => { setAiWindowVisible(false); openSettings() }} settingsOpen={settingsOpen} onOpenAi={() => setAiWindowVisible(true)} onSelectKnowledge={item => { if (item.route) navigate(item.route) }} />
     <AiWindow visible={aiWindowVisible} onClose={() => setAiWindowVisible(false)} context={{ chapterId: bstOpen ? 'bst-search' : 'linked-list-creation', chapterTitle: bstOpen ? '二叉搜索树查找' : '单链表创建', language }} />
     {overviewOpen && <div hidden={settingsOpen}><LearningOverview active={!settingsOpen} onNavigate={navigate} /></div>}
     {!bstOpen && <main className="experiment-page" hidden={settingsOpen || overviewOpen}>

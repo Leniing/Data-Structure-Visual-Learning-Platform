@@ -2,6 +2,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { expect, it, vi } from 'vitest'
 import App from './App'
+import { aiClient } from './ai/aiClient'
 
 it('shares every animation and input/code highlight between C and C++ for both methods', () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
@@ -52,6 +53,57 @@ it('shares every animation and input/code highlight between C and C++ for both m
   } finally {
     act(() => root.unmount())
     vi.useRealTimers()
+    vi.unstubAllGlobals()
+  }
+})
+
+
+it('closes AI on navigation and retains conversation and draft when reopened', async () => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+  vi.stubGlobal('matchMedia', () => ({ matches: true }))
+  aiClient.configured = true
+  vi.spyOn(aiClient, 'sendMessage').mockResolvedValue('保留的回复')
+  const host = document.createElement('div')
+  const root = createRoot(host)
+  const originalUrl = window.location.href
+  const click = (label: string) => act(() => host.querySelector<HTMLButtonElement>(`[aria-label="${label}"]`)!.click())
+  const type = (text: string) => act(() => {
+    const input = host.querySelector('textarea')!
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(input, text)
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+  try {
+    act(() => root.render(<App />))
+    click('AI 解答')
+    type('保留的问题')
+    await act(async () => host.querySelector<HTMLFormElement>('.ai-window form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })))
+    type('尚未发送的草稿')
+    const panel = host.querySelector<HTMLElement>('.ai-window')!
+    click('学习总览')
+    expect(panel.hidden).toBe(true)
+    click('AI 解答')
+    expect(panel.hidden).toBe(false)
+    click('设置')
+    expect(panel.hidden).toBe(true)
+    click('AI 解答')
+    for (const event of ['hashchange', 'popstate']) {
+      act(() => {
+        window.history.replaceState(null, '', '#bst-search')
+        window.dispatchEvent(new Event(event))
+      })
+      expect(panel.hidden).toBe(true)
+      click('AI 解答')
+      expect(panel.hidden).toBe(false)
+      expect(panel.querySelectorAll('article')).toHaveLength(2)
+      expect(panel.textContent).toContain('保留的问题')
+      expect(panel.textContent).toContain('保留的回复')
+      expect(panel.querySelector('textarea')!.value).toBe('尚未发送的草稿')
+    }
+  } finally {
+    act(() => root.unmount())
+    window.history.replaceState(null, '', originalUrl)
+    aiClient.configured = false
+    vi.restoreAllMocks()
     vi.unstubAllGlobals()
   }
 })

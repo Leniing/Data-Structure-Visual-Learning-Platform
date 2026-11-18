@@ -47,17 +47,12 @@ it('labels the region AI 解答 and leaves titlebar buttons outside drag capture
   try {
     const section = app.host.querySelector('section')!
     expect(document.getElementById(section.getAttribute('aria-labelledby')!)!.textContent).toBe('AI 解答')
-    expect(app.host.querySelector('textarea')!.placeholder).toBe('输入你对本章知识的疑问…')
+    expect(app.host.querySelector('textarea')!.placeholder).toBe('请输入你的疑问...')
     const header = app.host.querySelector('header')!
     const capture = vi.fn()
     Object.defineProperty(header, 'setPointerCapture', { value: capture })
-    const maximize = app.host.querySelector<HTMLButtonElement>('[aria-label="最大化 AI 窗口"]')!
-    act(() => {
-      maximize.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0 }))
-      maximize.click()
-    })
-    expect(capture).not.toHaveBeenCalled()
-    expect(section.style.width).toBe(`${window.innerWidth - 16}px`)
+    expect(header.querySelectorAll('button')).toHaveLength(1)
+    expect(header.querySelector('svg')).not.toBeNull()
     const closeButton = app.host.querySelector<HTMLButtonElement>('[aria-label="关闭 AI 窗口"]')!
     act(() => {
       closeButton.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0 }))
@@ -79,21 +74,16 @@ it('keeps input editable but disables sending without calling a service', () => 
     act(() => app.host.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })))
     expect(send).not.toHaveBeenCalled()
     expect(app.host.querySelector('textarea')!.value).toBe('测试问题')
-    expect(app.host.querySelector('[role="status"]')!.textContent).toBe('AI 服务尚未接入')
+    expect(app.host.querySelector('[role="status"]')!.textContent).toBe('')
   } finally { app.cleanup() }
 })
 
-it('maximizes and restores geometry, and clamps after a viewport resize', () => {
+it('clamps geometry after a viewport resize', () => {
   const app = setup()
   const originalWidth = window.innerWidth
   const originalHeight = window.innerHeight
   try {
     const section = app.host.querySelector('section')!
-    const initialStyle = section.getAttribute('style')
-    act(() => app.host.querySelector<HTMLButtonElement>('[aria-label="最大化 AI 窗口"]')!.click())
-    expect(section.style.width).toBe(`${window.innerWidth - 16}px`)
-    act(() => app.host.querySelector<HTMLButtonElement>('[aria-label="还原 AI 窗口"]')!.click())
-    expect(section.getAttribute('style')).toBe(initialStyle)
     act(() => {
       Object.defineProperty(window, 'innerWidth', { configurable: true, value: 240 })
       Object.defineProperty(window, 'innerHeight', { configurable: true, value: 280 })
