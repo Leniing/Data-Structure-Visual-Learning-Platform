@@ -85,7 +85,7 @@ export default function CanvasPanel({ insertMethod, onInsertMethodChange, step, 
   return (
     <section className="canvas-panel panel" aria-labelledby="canvas-title">
       <div className="panel-heading">
-        <h2 id="canvas-title">链表画布</h2>
+        <h2 id="canvas-title">画布</h2>
         <div className="canvas-heading-controls">
           <div className="method-switch" role="group" aria-label="插入方式">
             <button type="button" className={insertMethod === 'head' ? 'selected' : ''} onClick={() => onInsertMethodChange('head')}>头插法</button>

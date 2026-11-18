@@ -21,9 +21,9 @@ describe('useTailPlayer', () => {
   it('stays empty before creation and supports pause, stepping and completion', () => {
     expect(player.current).toBeNull()
     act(() => player.start([1]))
-    expect(player.current?.codeLineId).toBe('tail-head')
+    expect(player.current?.codeLineId).toBe('head-head')
     act(() => vi.advanceTimersByTime(850))
-    expect(player.current?.codeLineId).toBe('tail-initialise')
+    expect(player.current?.codeLineId).toBe('head-count-declare')
     act(() => player.toggle())
     const paused = player.index
     act(() => vi.advanceTimersByTime(5000))

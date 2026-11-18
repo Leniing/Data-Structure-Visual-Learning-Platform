@@ -17,7 +17,7 @@ import LearningOverview from './overview/LearningOverview'
 import BstSearchPage from './BstSearchPage'
 
 function App() {
-  const [insertMethod, setInsertMethod] = useState<InsertMethod>('tail')
+  const [insertMethod, setInsertMethod] = useState<InsertMethod>('head')
   const [language, setLanguage] = useState<CodeLanguage>('c')
   const player = useTailPlayer()
   const [preferences, setPreferences] = usePreferences()

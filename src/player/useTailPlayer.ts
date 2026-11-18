@@ -4,7 +4,7 @@ import { createByTailSteps, type TailInsertionStep } from '../domain/tailInserti
 import type { InsertMethod } from '../algorithms/parseListInput'
 
 export function useTailPlayer() {
-  const [method, setMethod] = useState<InsertMethod>('tail')
+  const [method, setMethod] = useState<InsertMethod>('head')
   const [steps, setSteps] = useState<readonly (TailInsertionStep | HeadInsertionStep)[]>([])
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
