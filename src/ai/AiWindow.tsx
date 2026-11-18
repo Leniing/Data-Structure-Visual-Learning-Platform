@@ -37,6 +37,13 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
   const headingId = useId()
 
   useLayoutEffect(() => {
+    gesture.current = null
+    if (visible) {
+      setRect(initialRect(viewport(), initialLeft))
+    }
+  }, [visible, initialLeft])
+
+  useLayoutEffect(() => {
     latestContext.current = contextKey
     request.current?.abort()
     request.current = null
@@ -108,15 +115,6 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
     void send(history)
   }
 
-  function stop() {
-    request.current?.abort()
-    request.current = null
-    sequence.current += 1
-    setLoading(false)
-    setError('已停止生成，可重试')
-    setRetryMessages(messages)
-  }
-
   function begin(event: ReactPointerEvent<HTMLElement>, mode: 'move' | 'resize') {
     if (event.button !== 0 || event.target !== event.currentTarget) return
     event.preventDefault()
@@ -168,6 +166,7 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
       </div>
       {aiClient.configured && error && retryMessages && <button className="ai-window-retry" type="button" onClick={() => void send(retryMessages)}>重试发送</button>}
       <form className="ai-window-composer" onSubmit={(event) => { event.preventDefault(); submit() }}>
+        <div className="ai-window-input-box">
         <textarea aria-label="输入 AI 消息" placeholder="请输入你的疑问..." value={draft} maxLength={MAX_DRAFT}
           onChange={(event) => setDraft(event.target.value.slice(0, MAX_DRAFT))}
           onCompositionStart={() => { composing.current = true }} onCompositionEnd={() => { composing.current = false }}
@@ -178,10 +177,10 @@ export function AiWindow({ visible, onClose, context, initialLeft }: AiWindowPro
             }
           }} />
         <div className="ai-window-send-row">
-          {loading && <button type="button" onClick={stop}>停止生成</button>}
           <button className="ai-window-icon ai-window-send" type="submit" disabled={Boolean(disabledReason)} aria-label="发送消息" title={disabledReason || '发送消息'}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-7 18-4-7-7-4 18-7ZM10 14 21 3" /></svg>
           </button>
+        </div>
         </div>
       </form>
       <button type="button" className="ai-window-resize" aria-label="调整 AI 窗口大小"

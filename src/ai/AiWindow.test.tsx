@@ -27,12 +27,21 @@ function type(host: HTMLElement, value: string) {
   })
 }
 
-it('preserves the same textarea, draft and rectangle while hidden and reopened', () => {
+it('resets a dragged and resized window on reopen while preserving the textarea and draft', () => {
   const app = setup()
   try {
     type(app.host, '如何创建单链表？')
     const input = app.host.querySelector('textarea')!
     const rect = app.host.querySelector('section')!.getAttribute('style')
+    const header = app.host.querySelector('header')!
+    Object.defineProperty(header, 'setPointerCapture', { value: vi.fn() })
+    act(() => header.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 240, clientY: 90 })))
+    act(() => header.dispatchEvent(new MouseEvent('pointermove', { bubbles: true, clientX: 320, clientY: 150 })))
+    act(() => app.host.querySelector('[aria-label="调整 AI 窗口大小"]')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', shiftKey: true, bubbles: true })))
+    act(() => app.host.querySelector('[aria-label="调整 AI 窗口大小"]')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', shiftKey: true, bubbles: true })))
+    expect(app.host.querySelector('section')!.style.width).toBe('420px')
+    expect(app.host.querySelector('section')!.style.height).toBe('520px')
+    expect(app.host.querySelector('section')!.getAttribute('style')).not.toBe(rect)
     app.render(false)
     expect(app.host.querySelector('section')!.hidden).toBe(true)
     app.render(true)
@@ -127,20 +136,19 @@ it('does not send Enter during IME composition', () => {
   } finally { app.cleanup() }
 })
 
-it('ignores a late response after stopping and supports retry with safe text rendering', async () => {
+it('shows no stop button during generation and supports retry after failure', async () => {
   aiClient.configured = true
-  let resolve!: (value: string) => void
-  const send = vi.spyOn(aiClient, 'sendMessage').mockImplementationOnce(() => new Promise((done) => { resolve = done }))
+  let reject!: (reason: Error) => void
+  vi.spyOn(aiClient, 'sendMessage').mockImplementationOnce(() => new Promise((_resolve, fail) => { reject = fail }))
     .mockResolvedValueOnce('<script>unsafe</script>\n```ts\nconst n = 1\n```')
   const app = setup()
   try {
     type(app.host, '问题')
     await act(async () => app.host.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })))
-    const stop = [...app.host.querySelectorAll('button')].find((button) => button.textContent === '停止生成')!
-    act(() => stop.click())
-    expect(send.mock.calls[0][0].signal.aborted).toBe(true)
-    await act(async () => resolve('过期回复'))
-    expect(app.host.textContent).not.toContain('过期回复')
+    expect(app.host.textContent).not.toContain('停止生成')
+    expect(app.host.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true)
+    await act(async () => reject(new Error('请求失败')))
+    expect(app.host.textContent).toContain('请求失败')
     await act(async () => [...app.host.querySelectorAll('button')].find((button) => button.textContent === '重试发送')!.click())
     expect(app.host.querySelector('script')).toBeNull()
     expect(app.host.querySelector('code')!.textContent).toBe('const n = 1\n')
