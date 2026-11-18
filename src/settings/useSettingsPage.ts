@@ -28,7 +28,7 @@ export function useSettingsPage() {
     } else {
       const { pathname, search } = window.location
       window.history.replaceState(null, '', pathname + search)
-      setSettingsOpen(false)
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
     }
   }
 

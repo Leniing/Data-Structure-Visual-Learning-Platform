@@ -20,12 +20,16 @@ it('opens settings, keeps the learning page mounted, and restores saved preferen
 
   try {
     localStorage.removeItem(storageKey)
+    const { pathname, search } = window.location
+    const homeUrl = pathname + search
+    window.history.replaceState(null, '', homeUrl)
     act(() => root.render(<App />))
-    const learningPage = host.querySelector<HTMLElement>('.experiment-page')!
+    const learningPage = host.querySelector<HTMLElement>('.overview-page')!
+    const learningPageContainer = learningPage.parentElement!
     act(() => button('.nav-settings').click())
     expect(window.location.hash).toBe('#settings')
     expect(document.activeElement?.id).toBe('settings-title')
-    expect(learningPage.hidden).toBe(true)
+    expect(learningPageContainer.hidden).toBe(true)
     expect(radio('palette', 'multicolor').checked).toBe(true)
     expect(radio('palette', 'sand').checked).toBe(false)
     expect(radio('palette', 'multicolor').labels?.[0].textContent).toBe('默认')
@@ -42,12 +46,12 @@ it('opens settings, keeps the learning page mounted, and restores saved preferen
     expect(appearance).toMatchObject({ theme: 'dark', palette: 'sage', interfaceFont: 'serif', codeFont: 'courier' })
 
     act(() => {
-      window.history.replaceState(originalState, '', originalUrl)
+      window.history.replaceState(null, '', homeUrl)
       window.dispatchEvent(new PopStateEvent('popstate'))
     })
     expect(host.querySelector('.settings-page')).toBeNull()
-    expect(host.querySelector('.experiment-page')).toBe(learningPage)
-    expect(learningPage.hidden).toBe(false)
+    expect(host.querySelector('.overview-page')).toBe(learningPage)
+    expect(learningPageContainer.hidden).toBe(false)
 
     act(() => root.unmount())
     window.history.replaceState(null, '', '#settings')
@@ -63,6 +67,7 @@ it('opens settings, keeps the learning page mounted, and restores saved preferen
     act(() => button('.settings-header button').click())
     expect(window.location.hash).toBe('')
     expect(host.querySelector('.settings-page')).toBeNull()
+    expect(host.querySelector<HTMLElement>('.overview-page')?.parentElement?.hidden).toBe(false)
   } finally {
     act(() => root.unmount())
     host.remove()

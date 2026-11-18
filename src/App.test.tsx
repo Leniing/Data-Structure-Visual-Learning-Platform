@@ -10,13 +10,19 @@ it('shares every animation and input/code highlight between C and C++ for both m
   vi.stubGlobal('matchMedia', () => ({ matches: true }))
   const host = document.createElement('div')
   const root = createRoot(host)
+  const originalUrl = window.location.href
   const click = (label: string) => {
     const button = Array.from(host.querySelectorAll<HTMLButtonElement>('button'))
       .find((item) => item.getAttribute('aria-label') === label || item.textContent === label)!
     act(() => button.click())
   }
   try {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search)
     act(() => root.render(<App />))
+    expect(host.querySelector('.overview-page h1')?.textContent).toBe('学习总览')
+    expect(host.querySelector<HTMLElement>('.experiment-page')?.hidden).toBe(true)
+    act(() => host.querySelector<HTMLAnchorElement>('.overview-page a[href="#linked-list-creation"]')!.click())
+    expect(host.querySelector<HTMLElement>('.experiment-page')?.hidden).toBe(false)
     for (const method of ['尾插法', '头插法']) {
       click(method)
       const runs: unknown[][] = []
@@ -52,6 +58,7 @@ it('shares every animation and input/code highlight between C and C++ for both m
     }
   } finally {
     act(() => root.unmount())
+    window.history.replaceState(null, '', originalUrl)
     vi.useRealTimers()
     vi.unstubAllGlobals()
   }
@@ -73,6 +80,7 @@ it('closes AI on navigation and retains conversation and draft when reopened', a
     input.dispatchEvent(new Event('input', { bubbles: true }))
   })
   try {
+    window.history.replaceState(null, '', '#linked-list-creation')
     act(() => root.render(<App />))
     click('AI 解答')
     type('保留的问题')

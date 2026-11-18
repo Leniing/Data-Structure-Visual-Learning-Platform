@@ -16,6 +16,8 @@ import LearningOverview from './overview/LearningOverview'
 
 import BstSearchPage from './BstSearchPage'
 
+const isOverviewRoute = (hash: string) => hash === '' || hash === '#overview'
+
 function App() {
   const [insertMethod, setInsertMethod] = useState<InsertMethod>('head')
   const [language, setLanguage] = useState<CodeLanguage>('c')
@@ -26,13 +28,15 @@ function App() {
   const [aiWindowVisible, setAiWindowVisible] = useState(false)
   const [lessonRoute, setLessonRoute] = useState(() => window.location.hash === '#bst-search' ? '#bst-search' : '#linked-list-creation')
   const bstOpen = lessonRoute === '#bst-search'
-  const [overviewOpen, setOverviewOpen] = useState(() => window.location.hash === '#overview')
+  const [overviewOpen, setOverviewOpen] = useState(() => isOverviewRoute(window.location.hash) || window.location.hash === '#settings')
   useEffect(() => {
     const sync = () => {
       setAiWindowVisible(false)
       const hash = window.location.hash
-      if (hash !== '#settings') setOverviewOpen(hash === '#overview')
-      if (hash !== '#settings' && hash !== '#overview') setLessonRoute(hash === '#bst-search' ? hash : '#linked-list-creation')
+      if (hash === '#settings') return
+      const showOverview = isOverviewRoute(hash)
+      setOverviewOpen(showOverview)
+      if (!showOverview) setLessonRoute(hash === '#bst-search' ? hash : '#linked-list-creation')
     }
     window.addEventListener('hashchange', sync)
     window.addEventListener('popstate', sync)
