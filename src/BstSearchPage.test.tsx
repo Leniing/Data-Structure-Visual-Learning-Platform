@@ -2,6 +2,65 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { expect, it, vi } from 'vitest'
 import App from './App'
+import BstSearchPage from './BstSearchPage'
+
+it('defers incomplete input feedback and prevents submission during composition', () => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+  const host = document.createElement('div'), root = createRoot(host)
+  document.body.append(host)
+  try {
+    act(() => root.render(<BstSearchPage active language="c" onLanguageChange={() => {}} />))
+    const input = host.querySelector('input')!
+    const button = host.querySelector<HTMLButtonElement>('.primary-button')!
+    const feedback = () => host.querySelector('#bst-input-feedback')!
+    const type = (value: string) => act(() => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, value)
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+    act(() => input.focus())
+    type('   ')
+    expect(feedback().textContent).toBe('请输入查找值')
+    expect(input.getAttribute('aria-invalid')).toBe('false')
+    expect(feedback().querySelector('.field-error')).toBeNull()
+    expect(button.disabled).toBe(true)
+    act(() => input.blur())
+    expect(feedback().textContent).toBe('')
+    for (const sign of ['+', '-']) {
+      act(() => input.focus())
+      type(` ${sign} `)
+      expect(feedback().textContent).toBe('')
+      expect(input.getAttribute('aria-invalid')).toBe('false')
+      expect(button.disabled).toBe(true)
+      act(() => input.blur())
+      expect(feedback().textContent).toBe('查找值必须是整数')
+      expect(input.getAttribute('aria-invalid')).toBe('true')
+    }
+    act(() => input.focus())
+    for (const invalid of ['++', '--', '1-', 'abc', '1.2', '1 2', '2147483648']) {
+      type(invalid)
+      expect(input.getAttribute('aria-invalid')).toBe('true')
+      expect(feedback().querySelector('.field-error')).not.toBeNull()
+      expect(button.disabled).toBe(true)
+    }
+    type('11')
+    expect(button.disabled).toBe(false)
+    act(() => input.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true })))
+    expect(button.disabled).toBe(true)
+    act(() => host.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })))
+    expect(host.querySelector('.playback-panel .muted')!.textContent).toBe('等待查找')
+    type('中')
+    expect(feedback().textContent).toBe('')
+    expect(input.getAttribute('aria-invalid')).toBe('false')
+    act(() => input.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true })))
+    expect(input.getAttribute('aria-invalid')).toBe('true')
+    expect(feedback().textContent).toBe('查找值必须是整数')
+    type('-11')
+    expect(feedback().textContent).toBe('')
+    expect(button.disabled).toBe(false)
+  } finally {
+    act(() => root.unmount()); host.remove()
+  }
+})
 
 it('restores every visual/code/result snapshot, keeps language steps, and resets method/target', () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })

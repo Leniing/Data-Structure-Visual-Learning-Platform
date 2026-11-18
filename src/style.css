@@ -186,6 +186,9 @@ button:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2p
 button:disabled, input:disabled, select:disabled { opacity: .64; }
 
 .field-hint { margin: 6px 0 0; font-size: 11px; }
+.input-feedback { grid-row: 3; height: 22px; min-height: 0; min-width: 0; padding-top: 6px; overflow: auto; }
+.input-feedback .field-hint { margin: 0; line-height: 16px; }
+.input-feedback output { display: block; }
 
 .workspace {
   display: grid;

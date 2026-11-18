@@ -100,9 +100,9 @@ export default function InputPanel({ supported, activeInput, inputIndex, onCreat
           </div>
           <button type="button" className="primary-button" disabled={!result.ok || !supported} onClick={() => { if (result.ok && supported) onCreate(result.values) }}>创建链表</button>
         </div>
-        <p id="input-feedback" className={`field-hint ${isError ? 'field-error' : ''}`} aria-live="polite">
-          {message}
-        </p>
+        <div id="input-feedback" className="input-feedback" aria-live="polite">
+          <p className={`field-hint ${isError ? 'field-error' : ''}`}>{message}</p>
+        </div>
       </div>
     </section>
   )
