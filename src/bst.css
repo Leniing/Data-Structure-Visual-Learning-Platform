@@ -10,11 +10,10 @@
 .bst-motion-arrow.return { stroke: var(--bst-purple); }
 .bst-arrow-head.down { fill: var(--bst-amber); }
 .bst-arrow-head.return { fill: var(--bst-purple); }
-.bst-page .input-controls { grid-template-rows: 11px 36px 24px; }
 .bst-page .input-row { flex-direction: row; align-items: stretch; }
 .bst-page .input-row input { flex: 1; height: 36px; min-height: 36px; font: 14px/1.5 Consolas, monospace; }
-.bst-page .input-row .primary-button { height: 36px; min-height: 36px; }
-.bst-input-feedback { grid-row: 3; height: 24px; min-height: 0; min-width: 0; padding-top: 6px; overflow: auto; }
+.bst-page .input-row .primary-button { height: auto; min-height: 0; }
+.bst-input-feedback { grid-row: 3; height: 22px; min-height: 0; min-width: 0; padding-top: 6px; overflow: auto; }
 .bst-page .bst-input-feedback .field-hint { margin: 0; line-height: 16px; }
 .bst-page .bst-input-feedback output { display: block; }
 .bst-page input:focus-visible { outline: 2px solid var(--appearance-focus); }
